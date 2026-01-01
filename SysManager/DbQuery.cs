@@ -1,0 +1,348 @@
+﻿// DbQuery.cs
+using System;
+using System.Collections.Generic;
+using FirebirdSql.Data.FirebirdClient;
+using System.Linq;
+using SysManager.Models;
+
+namespace SysManager
+{
+    class DbQuery
+    {
+        public IEnumerable<(int Id, string Name, decimal Price)> GetAll()
+        {
+            var list = new List<(int, string, decimal)>();
+
+            try
+            {
+                using (var conn = DbConnectionFactory.GetOpenConnection())
+                using (var cmd = new FbCommand("SELECT ID, NAME, PRICE FROM PRODUSE", conn))
+                using (var reader = cmd.ExecuteReader())
+                {
+                    while (reader.Read())
+                    {
+                        list.Add((reader.GetInt32(0), reader.GetString(1), reader.GetDecimal(2)));
+                    }
+                }
+
+                Logs.Write($"GetAll: Încărcate {list.Count} produse");
+            }
+            catch (Exception ex)
+            {
+                Logs.Write(ex);
+                throw;
+            }
+
+            return list;
+        }
+
+        public void Add(string name, decimal price)
+        {
+            try
+            {
+                using (var conn = DbConnectionFactory.GetOpenConnection())
+                using (var cmd = new FbCommand("INSERT INTO PRODUSE (NAME, PRICE) VALUES (@name, @price)", conn))
+                {
+                    cmd.Parameters.AddWithValue("name", name);
+                    cmd.Parameters.AddWithValue("price", price);
+                    cmd.ExecuteNonQuery();
+                }
+
+                Logs.Write($"Add: Produs adăugat - {name}, {price} RON");
+            }
+            catch (Exception ex)
+            {
+                Logs.Write(ex);
+                throw;
+            }
+        }
+
+        /// <summary>
+        /// Preia grupele de articole din baza de date folosind procedura GET_GRUPE_ARTICOLE
+        /// </summary>
+        public List<GrupaArticole> GetGrupeArticole(int gestiuneId = 0, int useShowOrder = 1)
+        {
+            var grupe = new List<GrupaArticole>();
+
+            try
+            {
+                Logs.Write($"GetGrupeArticole: Încărcare grupe (gestiuneId={gestiuneId}, useShowOrder={useShowOrder})");
+
+                using (var conn = DbConnectionFactory.GetOpenConnection())
+                using (var cmd = new FbCommand("SELECT * FROM GET_GRUPE_ARTICOLE(?, ?)", conn))
+                {
+                    cmd.Parameters.Add(new FbParameter { Value = gestiuneId });
+                    cmd.Parameters.Add(new FbParameter { Value = useShowOrder });
+
+                    using (var reader = cmd.ExecuteReader())
+                    {
+                        int index = 0;
+                        while (reader.Read())
+                        {
+                            try
+                            {
+                                string denumire = reader.IsDBNull(0) ? "N/A" : reader.GetString(0);
+                                int numarArticole = reader.IsDBNull(1) ? 0 : reader.GetInt32(1); // ✅ Acum citim direct ca INT32
+                                int id = reader.IsDBNull(2) ? 0 : reader.GetInt32(2);
+                                int showOrder = reader.IsDBNull(3) ? 0 : reader.GetInt32(3);
+
+                                var grupa = new GrupaArticole
+                                {
+                                    Denumire = denumire,
+                                    NumarArticole = numarArticole,
+                                    Id = id,
+                                    ShowOrder = showOrder
+                                };
+
+                                Logs.Write($"  [{++index}] '{grupa.Denumire}' → {grupa.NumarArticole} articole");
+                                grupe.Add(grupa);
+                            }
+                            catch (Exception ex)
+                            {
+                                Logs.Write($"❌ EROARE citire rând {index + 1}:");
+                                Logs.Write(ex);
+                            }
+                        }
+                    }
+                }
+
+                Logs.Write($"✅ Încărcate {grupe.Count} grupe (Total articole: {grupe.Sum(g => g.NumarArticole)})");
+            }
+            catch (Exception ex)
+            {
+                Logs.Write($"❌ EROARE GetGrupeArticole:");
+                Logs.Write(ex);
+                throw;
+            }
+
+            return grupe;
+        }
+
+
+        /// <summary>
+        /// Încarcă setările pentru afișarea grupelor (dimensiuni butoane, înălțime panou, culori)
+        /// </summary>
+        public GrupeSettings GetGrupeSettings()
+        {
+            var settings = new GrupeSettings
+            {
+                Id = 1,
+                Inaltime = 75,
+                Latime = 150,
+                PanouHeight = 0 // 0 = automat
+            };
+
+            try
+            {
+                Logs.Write("GetGrupeSettings: Încărcare setări grupe");
+
+                using (var conn = DbConnectionFactory.GetOpenConnection())
+                using (var cmd = new FbCommand(@"
+                    SELECT ID, INALTIME, LATIME, PANOU_HEIGHT, 
+                           BORDER_COLOR, COLOR_NORMAL, COLOR_PRESSED, 
+                           COLOR_HOVER, COLOR_DISABLED
+                    FROM SM_GRUPE_SETTINGS
+                    WHERE ID = 1", conn))
+                using (var reader = cmd.ExecuteReader())
+                {
+                    if (reader.Read())
+                    {
+                        settings.Id = reader.GetInt32(0);
+
+                        // Parse INALTIME și LATIME (sunt VARCHAR)
+                        if (int.TryParse(reader.GetString(1), out int inaltime))
+                            settings.Inaltime = inaltime;
+
+                        if (int.TryParse(reader.GetString(2), out int latime))
+                            settings.Latime = latime;
+
+                        settings.PanouHeight = reader.GetInt32(3);
+
+                        settings.BorderColor = reader.IsDBNull(4) ? null : reader.GetString(4);
+                        settings.ColorNormal = reader.IsDBNull(5) ? null : reader.GetString(5);
+                        settings.ColorPressed = reader.IsDBNull(6) ? null : reader.GetString(6);
+                        settings.ColorHover = reader.IsDBNull(7) ? null : reader.GetString(7);
+                        settings.ColorDisabled = reader.IsDBNull(8) ? null : reader.GetString(8);
+
+                        Logs.Write($"GetGrupeSettings: Încărcate setări - Buton: {settings.Latime}x{settings.Inaltime}px, Panou: {settings.PanouHeight}px");
+                    }
+                    else
+                    {
+                        Logs.Write("GetGrupeSettings: Nicio înregistrare găsită, folosim valorile default");
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                Logs.Write("EROARE la încărcarea setărilor grupelor:");
+                Logs.Write(ex);
+            }
+
+            return settings;
+        }
+
+
+        /// <summary>
+        /// Încarcă setările pentru afișarea produselor (dimensiuni butoane, înălțime panou, culori)
+        /// </summary>
+        public ProduseSettings GetProduseSettings()
+        {
+            var settings = new ProduseSettings
+            {
+                Id = 1,
+                Inaltime = 75,
+                Latime = 150,
+            };
+
+            try
+            {
+                Logs.Write("GetPruseSettings: Încărcare setări produse");
+
+                using (var conn = DbConnectionFactory.GetOpenConnection())
+                using (var cmd = new FbCommand(@"
+                    SELECT ID, INALTIME, LATIME, BORDER_COLOR, COLOR_NORMAL, COLOR_PRESSED, 
+                           COLOR_HOVER, COLOR_DISABLED
+                    FROM SM_PROD_SETTINGS
+                    WHERE ID = 1", conn))
+                using (var reader = cmd.ExecuteReader())
+                {
+                    if (reader.Read())
+                    {
+                        settings.Id = reader.GetInt32(0);
+
+                        // Parse INALTIME și LATIME (sunt VARCHAR)
+                        if (int.TryParse(reader.GetString(1), out int inaltime))
+                            settings.Inaltime = inaltime;
+
+                        if (int.TryParse(reader.GetString(2), out int latime))
+                            settings.Latime = latime;
+
+
+                        settings.BorderColor = reader.IsDBNull(4) ? null : reader.GetString(4);
+                        settings.ColorNormal = reader.IsDBNull(5) ? null : reader.GetString(5);
+                        settings.ColorPressed = reader.IsDBNull(6) ? null : reader.GetString(6);
+                        settings.ColorHover = reader.IsDBNull(7) ? null : reader.GetString(7);
+                        settings.ColorDisabled = reader.IsDBNull(8) ? null : reader.GetString(8);
+
+                        Logs.Write($"GetPruseSettings: Încărcate setări - Buton: {settings.Latime}x{settings.Inaltime}px");
+                    }
+                    else
+                    {
+                        Logs.Write("GetPruseSettings: Nicio înregistrare găsită, folosim valorile default");
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                Logs.Write("EROARE la încărcarea setărilor produselor:");
+                Logs.Write(ex);
+            }
+
+            return settings;
+        }
+
+        /// <summary>
+        /// Încarcă lista de gestiuni active din baza de date
+        /// </summary>
+        public List<Gestiune> GetGestiuni()
+        {
+            var gestiuni = new List<Gestiune>();
+
+            try
+            {
+                Logs.Write("GetGestiuni: Încărcare gestiuni active");
+
+                using (var conn = DbConnectionFactory.GetOpenConnection()) // ✅ FOLOSEȘTE DbConnectionFactory
+                using (var cmd = new FbCommand(@"
+            SELECT ID, NUME, NUME_GEST, STATUS
+            FROM SM_GESTIUNI
+            WHERE STATUS = 1
+            ORDER BY ID", conn))
+                using (var reader = cmd.ExecuteReader())
+                {
+                    while (reader.Read())
+                    {
+                        gestiuni.Add(new Gestiune
+                        {
+                            Id = reader.GetInt32(0),
+                            Nume = reader.IsDBNull(1) ? "" : reader.GetString(1).Trim(),
+                            NumeGest = reader.IsDBNull(2) ? "" : reader.GetString(2).Trim(),
+                            Status = reader.GetInt32(3)
+                        });
+                    }
+                }
+
+                Logs.Write($"✅ Încărcate {gestiuni.Count} gestiuni din baza de date");
+            }
+            catch (Exception ex)
+            {
+                Logs.Write("❌ EROARE la încărcarea gestiunilor:");
+                Logs.Write(ex);
+            }
+
+            return gestiuni;
+        }
+
+        /// <summary>
+        /// Încarcă produsele pentru o grupă și gestiune specifică
+        /// </summary>
+        /// <param name="grupaId">ID-ul grupei (0 sau NULL = toate grupele)</param>
+        /// <param name="gestiuneId">ID-ul gestiunii (0 = toate gestiunile)</param>
+        /// <returns>Lista de produse</returns>
+        public List<Produs> GetProduse(int gestiuneId = 0, int grupaId = 0)
+        {
+            var produse = new List<Produs>();
+
+            try
+            {
+                // Convertim 0 în NULL pentru MY_PARAM (grupaId)
+                object myParam = grupaId == 0 ? (object)DBNull.Value : grupaId;
+
+                Logs.Write($"GetProduse: Încărcare produse (grupaId={grupaId}, gestiuneId={gestiuneId})");
+
+                using (var conn = DbConnectionFactory.GetOpenConnection())
+                using (var cmd = new FbCommand("SELECT * FROM CITESTEARTICOLE_GRUPA_GESTIUNE(?, ?)", conn))
+                {
+                    // ✅ Parametri poziționali
+                    cmd.Parameters.Add(new FbParameter { Value = myParam });          // MY_PARAM (grupa)
+                    cmd.Parameters.Add(new FbParameter { Value = gestiuneId });       // GESTIUNE_PARAM
+
+                    using (var reader = cmd.ExecuteReader())
+                    {
+                        while (reader.Read())
+                        {
+                            produse.Add(new Produs
+                            {
+                                Id = reader.GetInt32(0),                                    // ID
+                                Denumire = reader.GetString(1).Trim(),                      // NUME
+                                Pret = reader.GetDecimal(2),                                // PRET
+                                PretBrut = reader.GetDecimal(3),                            // BRUT
+                                TvaValoare = reader.GetDecimal(4),                          // TVA
+                                CaleImagine = reader.IsDBNull(5) ? null : reader.GetString(5).Trim(), // CALE_IMAGE
+                                ShowImage = reader.GetInt32(6),                             // SHOW_IMAGE
+                                TvaId = reader.GetInt32(7),                                 // TVA_ID
+                                CodSGR = reader.IsDBNull(8) ? null : reader.GetString(8).Trim(),     // COD_SGR
+                                UnitateMasura = reader.IsDBNull(9) ? "buc" : reader.GetString(9).Trim(), // U_MASURA
+                                Departament = reader.GetInt32(10),                          // ID_DEP
+                                TvaAmefId = reader.GetInt32(11)                             // ID_TVA_AMEF
+                            });
+                        }
+                    }
+                }
+
+                Logs.Write($"GetProduse: Încărcate {produse.Count} produse cu succes");
+            }
+            catch (Exception ex)
+            {
+                Logs.Write("EROARE la încărcarea produselor:");
+                Logs.Write(ex);
+                Logs.Write($"GetProduse: EROARE (grupaId={grupaId}, gestiuneId={gestiuneId})");
+                // Nu aruncăm excepția mai departe pentru a nu bloca interfața
+            }
+
+            return produse;
+        }
+
+
+    }
+}

@@ -1,0 +1,232 @@
+﻿<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:local="clr-namespace:SysManager.Controls">
+
+    <!-- ============================================ -->
+    <!-- STILUL PENTRU GroupButton (FĂRĂ ANIMAȚII)    -->
+    <!-- ============================================ -->
+    <Style TargetType="{x:Type local:GroupButton}">
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="{x:Type local:GroupButton}">
+                    <Border x:Name="border"
+                            Background="{TemplateBinding GroupColor}"
+                            BorderBrush="#2E5C8A"
+                            BorderThickness="1"
+                            CornerRadius="2">
+
+                        <Grid>
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="*"/>
+                                <RowDefinition Height="Auto"/>
+                            </Grid.RowDefinitions>
+
+                            <!-- Denumirea grupei -->
+                            <TextBlock Grid.Row="0"
+                                       Text="{TemplateBinding GroupName}"
+                                       Foreground="White"
+                                       FontSize="16"
+                                       FontWeight="Bold"
+                                       TextAlignment="Center"
+                                       VerticalAlignment="Center"
+                                       Margin="3"
+                                       TextWrapping="Wrap"/>
+
+                            <!-- Numărul de articole -->
+                            <TextBlock Grid.Row="1"
+                                       Text="{TemplateBinding ProductCount}"
+                                       Foreground="White"
+                                       FontSize="12"
+                                       TextAlignment="Center"
+                                       Margin="0,0,0,5">
+                            </TextBlock>
+                        </Grid>
+                    </Border>
+
+                    <ControlTemplate.Triggers>
+                        <!-- ✅ HOVER - Albastru mai închis -->
+                        <Trigger Property="IsMouseOver" Value="True">
+                            <Setter TargetName="border" Property="Background" Value="#0052B8"/>
+                            <Setter TargetName="border" Property="BorderBrush" Value="#4A90E2"/>
+                        </Trigger>
+
+                        <!-- ✅ PRESSED - Albastru foarte închis (DOAR CULOARE) -->
+                        <Trigger Property="IsPressed" Value="True">
+                            <Setter TargetName="border" Property="Background" Value="#003D82"/>
+                            <Setter TargetName="border" Property="BorderBrush" Value="#FFD700"/>
+                        </Trigger>
+
+                        <!-- ✅ SELECTED - Verde cu bordură aurie -->
+                        <Trigger Property="IsSelected" Value="True">
+                            <Setter TargetName="border" Property="Background" Value="#2E7D32"/>
+                            <Setter TargetName="border" Property="BorderBrush" Value="#FFD700"/>
+                            <Setter TargetName="border" Property="BorderThickness" Value="3"/>
+                        </Trigger>
+
+                        <!-- ✅ DISABLED - Gri -->
+                        <Trigger Property="IsEnabled" Value="False">
+                            <Setter TargetName="border" Property="Background" Value="#808080"/>
+                            <Setter TargetName="border" Property="Opacity" Value="0.5"/>
+                        </Trigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+    <!-- ============================================ -->
+    <!-- STILUL PENTRU GestiuneButton                 -->
+    <!-- ============================================ -->
+    <Style TargetType="{x:Type local:GestiuneButton}">
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="{x:Type local:GestiuneButton}">
+                    <Border x:Name="border"
+                        Background="{TemplateBinding GestiuneColor}"
+                        BorderBrush="#8B4513"
+                        BorderThickness="2"
+                        CornerRadius="3"
+                        Margin="1">
+
+                        <TextBlock Text="{TemplateBinding GestiuneName}"
+                               Foreground="White"
+                               FontSize="14"
+                               FontWeight="Bold"
+                               TextAlignment="Center"
+                               VerticalAlignment="Center"
+                               Margin="5"
+                               TextWrapping="Wrap"/>
+                    </Border>
+
+                    <ControlTemplate.Triggers>
+                        <!-- HOVER -->
+                        <Trigger Property="IsMouseOver" Value="True">
+                            <Setter TargetName="border" Property="Background" Value="#D2691E"/>
+                            <Setter TargetName="border" Property="BorderBrush" Value="#FF8C00"/>
+                        </Trigger>
+
+                        <!-- PRESSED -->
+                        <Trigger Property="IsPressed" Value="True">
+                            <Setter TargetName="border" Property="Background" Value="#A0522D"/>
+                            <Setter TargetName="border" Property="BorderBrush" Value="#FFD700"/>
+                        </Trigger>
+
+                        <!-- SELECTED -->
+                        <Trigger Property="IsSelected" Value="True">
+                            <Setter TargetName="border" Property="Background" Value="#2E7D32"/>
+                            <Setter TargetName="border" Property="BorderBrush" Value="#FFD700"/>
+                            <Setter TargetName="border" Property="BorderThickness" Value="3"/>
+                        </Trigger>
+
+                        <!-- DISABLED -->
+                        <Trigger Property="IsEnabled" Value="False">
+                            <Setter TargetName="border" Property="Background" Value="#808080"/>
+                            <Setter TargetName="border" Property="Opacity" Value="0.5"/>
+                        </Trigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+    <!-- ============================================ -->
+    <!-- STILUL PENTRU POSButton (BUTOANE PRODUSE)    -->
+    <!-- ============================================ -->
+    <Style TargetType="{x:Type local:POSButton}">
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="{x:Type local:POSButton}">
+                    <Border x:Name="border"
+                    Background="{TemplateBinding ProductColor}"
+                    BorderBrush="#01579B"
+                    BorderThickness="1"
+                    CornerRadius="2">
+                        <!-- ✅ ADĂUGAT Padding pentru a crea spațiu interior -->
+
+                        <Grid>
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="Auto"/>
+                                <!-- Imagine -->
+                                <RowDefinition Height="*"/>
+                                <!-- Nume produs -->
+                                <RowDefinition Height="Auto"/>
+                                <!-- Preț -->
+                            </Grid.RowDefinitions>
+
+                            <!-- ✅ IMAGINE PRODUS (dacă există) -->
+                            <Image Grid.Row="0"
+                           Source="{TemplateBinding ImagePath}"
+                           Stretch="UniformToFill"
+                           Height="40"
+                           Margin="2,2,2,0"
+                           HorizontalAlignment="Center"
+                           VerticalAlignment="Top">
+                                <Image.Style>
+                                    <Style TargetType="Image">
+                                        <Style.Triggers>
+                                            <Trigger Property="Source" Value="{x:Null}">
+                                                <Setter Property="Visibility" Value="Collapsed"/>
+                                            </Trigger>
+                                        </Style.Triggers>
+                                    </Style>
+                                </Image.Style>
+                            </Image>
+
+                            <!-- ✅ NUME PRODUS - MARGIN MĂRIT! -->
+                            <TextBlock Grid.Row="1"
+                               Text="{TemplateBinding ProductName}"
+                               Foreground="White"
+                               FontSize="12"
+                               FontWeight="Bold"
+                               TextAlignment="Center"
+                               VerticalAlignment="Top"
+                               Margin="1"
+                               Padding="0"
+                               TextWrapping="Wrap" 
+                               FontFamily="Arial"
+                               HorizontalAlignment="Center"/>
+                            <!-- ✅ Adaugă ellipsis dacă e prea lung -->
+
+                            <!-- ✅ PREȚ - MARGIN ȘI ALIGNMENT AJUSTATE! -->
+                            <Border Grid.Row="2"
+                            Margin="2,0,2,2"
+                            Padding="0">
+                                <TextBlock Text="{TemplateBinding Price}"
+                                   Foreground="White"
+                                   FontSize="10"
+                                   FontWeight="Bold"
+                                   TextAlignment="Right"
+                                   Margin="0,0,4,0"
+                                   Padding="2,1"/>
+                                <!-- ✅ Padding pentru a nu atinge marginea -->
+                            </Border>
+
+                        </Grid>
+                    </Border>
+
+                    <ControlTemplate.Triggers>
+                        <!-- ✅ HOVER - Albastru mai deschis -->
+                        <Trigger Property="IsMouseOver" Value="True">
+                            <Setter TargetName="border" Property="Background" Value="#0288D1"/>
+                            <Setter TargetName="border" Property="BorderBrush" Value="#03A9F4"/>
+                            <Setter TargetName="border" Property="BorderThickness" Value="3"/>
+                        </Trigger>
+
+                        <!-- ✅ PRESSED - Albastru foarte închis -->
+                        <Trigger Property="IsPressed" Value="True">
+                            <Setter TargetName="border" Property="Background" Value="#01579B"/>
+                            <Setter TargetName="border" Property="BorderBrush" Value="#FFD700"/>
+                            <Setter TargetName="border" Property="BorderThickness" Value="3"/>
+                        </Trigger>
+
+                        <!-- ✅ DISABLED - Gri -->
+                        <Trigger Property="IsEnabled" Value="False">
+                            <Setter TargetName="border" Property="Background" Value="#808080"/>
+                            <Setter TargetName="border" Property="Opacity" Value="0.5"/>
+                        </Trigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+
+</ResourceDictionary>

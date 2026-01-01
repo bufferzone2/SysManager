@@ -1,0 +1,116 @@
+﻿<Window x:Class="SysManager.BonuriAsteptareWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="Bonuri în Așteptare"
+        Width="600"
+        Height="500"
+        WindowStartupLocation="CenterOwner"
+        Background="#F5F5F5"
+        ResizeMode="CanResize" ShowInTaskbar="False" WindowStyle="None">
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+
+        <!-- ═══════════════════════════════════════════════ -->
+        <!-- HEADER -->
+        <!-- ═══════════════════════════════════════════════ -->
+        <Border Grid.Row="0" Background="#5B9BD5" Padding="15">
+            <TextBlock Text="📋 BONURI ÎN AȘTEPTARE"
+                       Foreground="White"
+                       FontSize="20"
+                       FontWeight="Bold"
+                       HorizontalAlignment="Center"/>
+        </Border>
+
+        <!-- ═══════════════════════════════════════════════ -->
+        <!-- LISTĂ BONURI -->
+        <!-- ═══════════════════════════════════════════════ -->
+        <ListView x:Name="BonuriListView"
+                  Grid.Row="1"
+                  Margin="10"
+                  SelectionMode="Single"
+                  MouseDoubleClick="BonuriListView_MouseDoubleClick"
+                  Background="Transparent"
+                  BorderThickness="0">
+            <ListView.ItemTemplate>
+                <DataTemplate>
+                    <Border Background="White"
+                            BorderBrush="#CCCCCC"
+                            BorderThickness="1"
+                            CornerRadius="4"
+                            Padding="15"
+                            Margin="5">
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="Auto"/>
+                            </Grid.ColumnDefinitions>
+
+                            <!-- ✅ Informații Bon -->
+                            <StackPanel Grid.Column="0">
+                                <TextBlock Text="{Binding DisplayText}"
+                                           FontSize="16"
+                                           FontWeight="Bold"
+                                           Foreground="#333333"/>
+                                <TextBlock Text="{Binding DisplayInfo}"
+                                           FontSize="12"
+                                           Foreground="#666666"
+                                           Margin="0,5,0,0"/>
+                                <TextBlock Text="{Binding Observatii}"
+                                           FontSize="11"
+                                           Foreground="#999999"
+                                           Margin="0,3,0,0"
+                                           TextWrapping="Wrap"/>
+                            </StackPanel>
+
+                            <!-- ✅ Buton Șterge -->
+                            <Button Grid.Column="1"
+                                    Content="🗑️"
+                                    Width="40"
+                                    Height="40"
+                                    Background="#E53935"
+                                    Foreground="White"
+                                    FontSize="18"
+                                    ToolTip="Șterge bonul"
+                                    Click="DeleteBon_Click"
+                                    Tag="{Binding Id}"
+                                    VerticalAlignment="Center"/>
+                        </Grid>
+                    </Border>
+                </DataTemplate>
+            </ListView.ItemTemplate>
+        </ListView>
+
+        <!-- ═══════════════════════════════════════════════ -->
+        <!-- BUTOANE ACȚIUNI -->
+        <!-- ═══════════════════════════════════════════════ -->
+        <StackPanel Grid.Row="2"
+                    Orientation="Horizontal"
+                    HorizontalAlignment="Right"
+                    Margin="10">
+            <Button Content="ÎNCARCĂ BON"
+                    Width="150"
+                    Height="50"
+                    Background="#4CAF50"
+                    Foreground="White"
+                    FontSize="14"
+                    FontWeight="Bold"
+                    Margin="0,0,10,0"
+                    Click="IncarcaBon_Click"
+                    ToolTip="Încarcă bonul selectat în grid"/>
+
+            <Button Content="ANULARE"
+                    Width="150"
+                    Height="50"
+                    Background="#999999"
+                    Foreground="White"
+                    FontSize="14"
+                    FontWeight="Bold"
+                    Click="Anulare_Click"
+                    ToolTip="Închide fereastra"/>
+        </StackPanel>
+    </Grid>
+</Window>
