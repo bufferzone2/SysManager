@@ -1,4 +1,5 @@
-﻿using System;
+﻿// BonManager.cs
+using System;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Linq;
@@ -345,7 +346,7 @@ namespace SysManager.Managers
         /// </summary>
         private void RecalculeazaTotal()
         {
-            Total = Items.Sum(item => item.Total);
+            Total = Items.Sum(item => item.PretBrut);
 
             Logs.Write($"💰 Total bon actualizat: {Total:F2} LEI ({NumarArticole} articole, {NumarBucati} bucăți)");
         }

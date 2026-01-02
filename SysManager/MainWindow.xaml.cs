@@ -70,6 +70,8 @@ namespace SysManager
             _bonuriAsteptareManager = new BonuriAsteptareManager();
             // ✅ Inițializează BonManager
             InitializeazaBonManager();
+
+            InitializeSearchTimer();
         }
 
         private void MainWindow_Loaded(object sender, RoutedEventArgs e)
@@ -213,10 +215,10 @@ namespace SysManager
 
         private void Clear_Click(object sender, RoutedEventArgs e)
         {
-            BonGrid.ItemsSource = null;
+            _bonManager.GolesteBon();
             TotalText.Text = "0.00";
             StatusText.Text = "Bon anulat";
-            Logs.Write("MainWindow: Bon anulat");
+            //Logs.Write("MainWindow: Bon anulat");
         }
 
         private void Pay_Click(object sender, RoutedEventArgs e)
@@ -227,6 +229,65 @@ namespace SysManager
             var dialog = new BonuriAsteptareWindow(bonuri, _bonuriAsteptareManager); 
             if (dialog.ShowDialog() == true) { 
                 IncarcaBonInGrid(dialog.BonSelectat); 
+            }
+        }
+
+        /// <summary>
+        /// Salvează bonul curent în așteptare
+        /// </summary>
+        private void SalveazaBonAsteptare_Click(object sender, RoutedEventArgs e)
+        {
+            try
+            {
+                // ✅ Verifică dacă există produse în bon (FOLOSEȘTE BONMANAGER)
+                if (_bonManager.EsteGol)
+                {
+                    MessageBox.Show("Bonul este gol. Adaugă produse înainte de a-l salva în așteptare.",
+                        "Atenție", MessageBoxButton.OK, MessageBoxImage.Warning);
+                    return;
+                }
+
+                // Creează obiectul BonAsteptare
+                var bon = new BonAsteptare
+                {
+                    NrBon = GenerareNrBon(),
+                    DataCreare = DateTime.Now,
+                    Total = _bonManager.Total,  // ✅ FOLOSEȘTE BONMANAGER
+                    Observatii = ""
+                };
+
+                // ✅ Adaugă produsele DIN BONMANAGER (NU DIN GRID!)
+                foreach (var bonItem in _bonManager.Items)
+                {
+                    bon.Detalii.Add(new BonAsteptareDetaliu
+                    {
+                        IdProdus = bonItem.IdProdus,
+                        DenumireProdus = bonItem.Nume,
+                        Cantitate = bonItem.Cantitate,
+                        PretUnitar = bonItem.Pret,
+                        Valoare = bonItem.Total
+                    });
+                }
+
+                // Salvează în baza de date
+                int bonId = _bonuriAsteptareManager.SalveazaBonInAsteptare(bon);
+
+                MessageBox.Show($"Bonul #{bon.NrBon} a fost salvat în așteptare!",
+                    "Succes", MessageBoxButton.OK, MessageBoxImage.Information);
+
+                // ✅ GOLEȘTE BONUL PRIN BONMANAGER (NU DIRECT GRID!)
+                _bonManager.GolesteBon();
+                TotalText.Text = "0.00";
+                _bonCurent = null;
+
+                Logs.Write($"Bon #{bon.NrBon} salvat în așteptare (ID: {bonId})");
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Eroare la salvarea bonului în așteptare: {ex.Message}",
+                    "Eroare", MessageBoxButton.OK, MessageBoxImage.Error);
+                Logs.Write("EROARE salvare bon în așteptare:");
+                Logs.Write(ex);
             }
         }
 
@@ -245,44 +306,49 @@ namespace SysManager
         }
 
         /// <summary>
-        /// Încarcă un bon din așteptare în grid
+        /// Încarcă un bon din așteptare în grid PRIN BONMANAGER
         /// </summary>
         private void IncarcaBonInGrid(BonAsteptare bon)
         {
             try
             {
-                // Golește grid-ul curent
-                BonGrid.Items.Clear();
+                // ✅ GOLEȘTE BONUL PRIN BONMANAGER
+                _bonManager.GolesteBon();
 
-                // Adaugă produsele din bon
+                // ✅ ADAUGĂ PRODUSELE PRIN BONMANAGER
                 foreach (var detaliu in bon.Detalii)
                 {
-                    BonGrid.Items.Add(new BonItem
+                    // Creează un obiect Produs din detaliile bonului
+                    var produs = new Produs
                     {
-                        IdProdus = detaliu.IdProdus,
-                        Nume = detaliu.DenumireProdus,
-                        Cantitate = detaliu.Cantitate,
+                        Id = detaliu.IdProdus,
+                        Denumire = detaliu.DenumireProdus,
                         Pret = detaliu.PretUnitar,
-                        //Total = detaliu.Valoare
-                    });
+                        // Completează și alte proprietăți necesare
+                    };
+
+                    // Adaugă produsul cu cantitatea salvată
+                    _bonManager.AdaugaProdus(produs, detaliu.Cantitate);
                 }
 
-                // Actualizează totalul
-                TotalText.Text = bon.Total.ToString("F2");
+                // ✅ Actualizează totalul (ar trebui să se actualizeze automat prin BonManager)
+                TotalText.Text = _bonManager.Total.ToString("F2");
 
-                // Salvează bonul curent pentru a-l putea identifica la încasare
+                // Salvează referința bonului curent
                 _bonCurent = bon;
 
                 StatusText.Text = $"Bon #{bon.NrBon} încărcat din așteptare";
-                Logs.Write($"Bon #{bon.NrBon} (ID: {bon.Id}) încărcat în grid");
+                Logs.Write($"Bon #{bon.NrBon} (ID: {bon.Id}) încărcat în grid ({bon.Detalii.Count} produse)");
             }
             catch (Exception ex)
             {
                 MessageBox.Show($"Eroare la încărcarea bonului: {ex.Message}",
                     "Eroare", MessageBoxButton.OK, MessageBoxImage.Error);
+                Logs.Write("EROARE la încărcarea bonului:");
                 Logs.Write(ex);
             }
         }
+
 
         // ═══════════════════════════════════════════════════════════════
         // INIȚIALIZARE BON MANAGER
@@ -323,6 +389,12 @@ namespace SysManager
             };
         }
 
+        /// <summary>    
+        /// Generează număr unic pentru bon    
+        /// </summary>    
+        private string GenerareNrBon()    {        
+            return $"TEMP{DateTime.Now:yyyyMMddHHmmss}";    
+        }
         #endregion
     }
 }

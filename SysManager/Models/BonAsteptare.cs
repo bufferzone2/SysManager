@@ -1,4 +1,5 @@
-﻿using System;
+﻿// BonAsteptare.cs
+using System;
 using System.Collections.Generic;
 
 namespace SysManager.Models

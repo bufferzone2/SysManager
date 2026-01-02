@@ -343,6 +343,68 @@ namespace SysManager
             return produse;
         }
 
+        /// <summary>
+        /// Caută produse după nume folosind procedura stocată SEARCHARTICOLE
+        /// </summary>
+        /// <param name="searchText">Textul de căutat</param>
+        /// <param name="grupaId">ID-ul grupei (0 = toate produsele)</param>
+        /// <returns>Lista de produse găsite</returns>
+        public List<Produs> SearchArticole(string searchText, int grupaId)
+        {
+            var produse = new List<Produs>();
+
+            try
+            {
+                // ✅ Convertim 0 în NULL pentru PARAM_GRUPA
+                object grupaParam = grupaId == 0 ? (object)DBNull.Value : grupaId;
+
+                Logs.Write($"🔍 SearchArticole: Căutare '{searchText}' (grupaId={grupaId})");
+
+                // ✅ FOLOSEȘTE DbConnectionFactory (ca toate celelalte metode!)
+                using (var conn = DbConnectionFactory.GetOpenConnection())
+                using (var cmd = new FbCommand("SELECT * FROM SEARCHARTICOLE(?, ?)", conn))
+                {
+                    // ✅ Parametri poziționali (ca în GetProduse)
+                    cmd.Parameters.Add(new FbParameter { Value = searchText ?? "" });  // PARAM_ARTICOL
+                    cmd.Parameters.Add(new FbParameter { Value = grupaParam });         // PARAM_GRUPA
+
+                    using (var reader = cmd.ExecuteReader())
+                    {
+                        while (reader.Read())
+                        {
+                            var produs = new Produs
+                            {
+                                Id = reader.GetInt32(0),                                    // ID
+                                Denumire = reader.GetString(1).Trim(),                      // NUME
+                                Pret = reader.GetDecimal(2),                                // PRET
+                                PretBrut = reader.GetDecimal(3),                            // BRUT
+                                TvaValoare = reader.GetDecimal(4),                          // TVA
+                                CaleImagine = reader.IsDBNull(5) ? null : reader.GetString(5).Trim(), // CALE_IMAGE
+                                ShowImage = reader.GetInt32(6),                             // SHOW_IMAGE (✅ INT32, nu INT16!)
+                                TvaId = reader.GetInt32(7),                                 // TVA_ID
+                                CodSGR = reader.IsDBNull(8) ? null : reader.GetString(8).Trim(),     // COD_SGR
+                                UnitateMasura = reader.IsDBNull(9) ? "buc" : reader.GetString(9).Trim(), // U_MASURA
+                                Departament = reader.GetInt32(10),                          // ID_DEP (✅ INT32, nu INT16!)
+                                TvaAmefId = reader.GetInt32(11)                             // ID_TVA_AMEF (✅ INT32, nu INT16!)
+                            };
+
+                            produse.Add(produs);
+                        }
+                    }
+                }
+
+                Logs.Write($"✅ SearchArticole: Găsite {produse.Count} produse pentru '{searchText}' (Grupa: {(grupaId == 0 ? "Toate" : grupaId.ToString())})");
+            }
+            catch (Exception ex)
+            {
+                Logs.Write("❌ EROARE la căutarea produselor:");
+                Logs.Write(ex);
+                // ✅ Nu aruncăm excepția mai departe pentru a nu bloca interfața
+            }
+
+            return produse;
+        }
+
 
     }
 }

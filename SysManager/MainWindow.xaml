@@ -393,6 +393,7 @@
                              Background="Transparent"
                              Height="32"
                              Padding="8,0"
+                             TextChanged="TxtCautareArticolBon_TextChanged">
                              ToolTip="Caută articol după denumire sau cod pentru BON">
                                 <TextBox.Style>
                                     <Style TargetType="TextBox">
@@ -420,9 +421,9 @@
                     </Grid>
                 </Border>
 
-                <!-- ═══════════════════════════════════════════════════════════ -->
+                <!-- ═══════════════════════════════════════════════════════════════ -->
                 <!-- ROW 1: DATAGRID BON -->
-                <!-- ═══════════════════════════════════════════════════════════ -->
+                <!-- ═══════════════════════════════════════════════════════════════ -->
                 <DataGrid x:Name="BonGrid"
                   Grid.Row="1"
                   AutoGenerateColumns="False"
@@ -433,11 +434,47 @@
                   FontSize="13"
                   GridLinesVisibility="Horizontal"
                   BorderThickness="0"
-                  Margin="5">
+                  Margin="5"
+                  CanUserAddRows="False"
+                  CanUserDeleteRows="False"
+                  IsReadOnly="True"
+                  SelectionMode="Single"
+                  SelectionUnit="FullRow">
                     <DataGrid.Columns>
-                        <DataGridTextColumn Header="Produs" Binding="{Binding Nume}" Width="*"/>
-                        <DataGridTextColumn Header="Cant" Binding="{Binding Cantitate}" Width="50"/>
-                        <DataGridTextColumn Header="Total" Binding="{Binding Total}" Width="70"/>
+                        <!-- ✅ Coloana Produs - fără formatare -->
+                        <DataGridTextColumn Header="Produs" 
+                            Binding="{Binding Nume}" 
+                            Width="*" 
+                            IsReadOnly="True"/>
+
+                        <!-- ✅ Coloana Cantitate - 3 ZECIMALE (ex: 1.000) -->
+                        <DataGridTextColumn Header="Cant" 
+                            Binding="{Binding Cantitate, StringFormat={}{0:F3}}" 
+                            Width="60" 
+                            IsReadOnly="True">
+                            <DataGridTextColumn.ElementStyle>
+                                <Style TargetType="TextBlock">
+                                    <Setter Property="HorizontalAlignment" Value="Right"/>
+                                    <Setter Property="Foreground" Value="#666666"/>
+                                    <!-- Culoare gri -->
+                                </Style>
+                            </DataGridTextColumn.ElementStyle>
+                        </DataGridTextColumn>
+
+                        <!-- ✅ Coloana Total - 2 ZECIMALE (ex: 45.00) -->
+                        <DataGridTextColumn Header="Total" 
+                            Binding="{Binding PretBrut, StringFormat={}{0:F2}}" 
+                            Width="80" 
+                            IsReadOnly="True">
+                            <DataGridTextColumn.ElementStyle>
+                                <Style TargetType="TextBlock">
+                                    <Setter Property="HorizontalAlignment" Value="Right"/>
+                                    <Setter Property="Foreground" Value="#666666"/>
+                                    <!-- Culoare gri -->
+                                    <Setter Property="FontWeight" Value="Bold"/>
+                                </Style>
+                            </DataGridTextColumn.ElementStyle>
+                        </DataGridTextColumn>
                     </DataGrid.Columns>
                 </DataGrid>
 
@@ -494,7 +531,8 @@
                     FontSize="12"
                     FontWeight="Bold"
                     Height="50"
-                    Margin="2"/>
+                    Margin="2"
+                    Click="SalveazaBonAsteptare_Click"/>
 
                     <Button Content="ÎNCASARE"
                     Background="#43A047"
@@ -515,25 +553,40 @@
         <!-- ═══════════════════════════════════════════════════════════════ -->
 
         <Border Grid.Row="3" Grid.ColumnSpan="2" 
-                Background="#5B9BD5" 
-                BorderBrush="#3576B3" 
-                BorderThickness="0,1,0,0">
+        Background="#5B9BD5" 
+        BorderBrush="#3576B3" 
+        BorderThickness="0,1,0,0"
+        Height="30">
             <Grid>
-                <TextBlock x:Name="StatusText"
-                           Text="Gata pentru comenzi"
-                           Foreground="White"
-                           FontSize="11"
-                           VerticalAlignment="Center"
-                           Margin="10,0"/>
+                <!-- ✅ Stânga: Imagine + Status -->
+                <StackPanel Orientation="Horizontal" 
+                    HorizontalAlignment="Left" 
+                    VerticalAlignment="Center">
 
+                    <Image x:Name="IconHelp" 
+                   Source="/Resources/Blue_MSG_INFO22.GIF" 
+                   Width="24" 
+                   Height="24" 
+                   VerticalAlignment="Center"
+                   Margin="4,0,8,0" />
+
+                    <TextBlock x:Name="StatusText"
+                       Text="Gata pentru comenzi"
+                       Foreground="White"
+                       FontSize="11"
+                       VerticalAlignment="Center"/>
+                </StackPanel>
+
+                <!-- ✅ Dreapta: Server Info -->
                 <TextBlock x:Name="TextServer"
-                           Text="SERVER: SRV-POS-01 | UTILIZATOR: Admin"
-                           Foreground="White"
-                           FontSize="11"
-                           VerticalAlignment="Center"
-                           HorizontalAlignment="Right"
-                           Margin="0,0,10,0"/>
+                   Text="SERVER: SRV-POS-01 | UTILIZATOR: Admin"
+                   Foreground="White"
+                   FontSize="11"
+                   VerticalAlignment="Center"
+                   HorizontalAlignment="Right"
+                   Margin="0,0,10,0"/>
             </Grid>
         </Border>
+
     </Grid>
 </Window>

@@ -53,7 +53,7 @@ namespace SysManager.Models
 
         private decimal _pret;
         /// <summary>
-        /// Prețul unitar cu TVA
+        /// Prețul unitar fara TVA
         /// </summary>
         public decimal Pret
         {
@@ -80,7 +80,7 @@ namespace SysManager.Models
 
         private decimal _pretBrut;
         /// <summary>
-        /// Prețul fără TVA
+        /// Prețul cu TVA
         /// </summary>
         public decimal PretBrut
         {
