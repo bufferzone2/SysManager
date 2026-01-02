@@ -13,8 +13,7 @@ namespace SysManager.Controls
         public static readonly DependencyProperty PriceProperty =
             DependencyProperty.Register(nameof(Price), typeof(string), typeof(POSButton), new PropertyMetadata("0.00 RON"));
 
-        public static readonly DependencyProperty StockProperty =
-            DependencyProperty.Register(nameof(Stock), typeof(string), typeof(POSButton), new PropertyMetadata("0 buc"));
+
 
         public static readonly DependencyProperty ImagePathProperty =
             DependencyProperty.Register(nameof(ImagePath), typeof(ImageSource), typeof(POSButton), new PropertyMetadata(null));
@@ -35,11 +34,7 @@ namespace SysManager.Controls
             set => SetValue(PriceProperty, value);
         }
 
-        public string Stock
-        {
-            get => (string)GetValue(StockProperty);
-            set => SetValue(StockProperty, value);
-        }
+
 
         public ImageSource ImagePath
         {
