@@ -129,6 +129,7 @@
     </Style>
     <!-- ============================================ -->
     <!-- STILUL PENTRU POSButton (BUTOANE PRODUSE)    -->
+    <!-- ✅ CU NUMELE GESTIUNII ÎN PARTEA STÂNGĂ      -->
     <!-- ============================================ -->
     <Style TargetType="{x:Type local:POSButton}">
         <Setter Property="Template">
@@ -139,7 +140,6 @@
                     BorderBrush="#01579B"
                     BorderThickness="1"
                     CornerRadius="2">
-                        <!-- ✅ ADĂUGAT Padding pentru a crea spațiu interior -->
 
                         <Grid>
                             <Grid.RowDefinitions>
@@ -148,7 +148,7 @@
                                 <RowDefinition Height="*"/>
                                 <!-- Nume produs -->
                                 <RowDefinition Height="Auto"/>
-                                <!-- Preț -->
+                                <!-- Preț + Gestiune -->
                             </Grid.RowDefinitions>
 
                             <!-- ✅ IMAGINE PRODUS (dacă există) -->
@@ -170,7 +170,7 @@
                                 </Image.Style>
                             </Image>
 
-                            <!-- ✅ NUME PRODUS - MARGIN MĂRIT! -->
+                            <!-- ✅ NUME PRODUS -->
                             <TextBlock Grid.Row="1"
                                Text="{TemplateBinding ProductName}"
                                Foreground="White"
@@ -183,21 +183,58 @@
                                TextWrapping="Wrap" 
                                FontFamily="Arial"
                                HorizontalAlignment="Center"/>
-                            <!-- ✅ Adaugă ellipsis dacă e prea lung -->
 
-                            <!-- ✅ PREȚ - MARGIN ȘI ALIGNMENT AJUSTATE! -->
-                            <Border Grid.Row="2"
-                            Margin="2,0,2,2"
-                            Padding="0">
-                                <TextBlock Text="{TemplateBinding Price}"
-                                   Foreground="White"
-                                   FontSize="10"
-                                   FontWeight="Bold"
-                                   TextAlignment="Right"
-                                   Margin="0,0,4,0"
-                                   Padding="2,1"/>
-                                <!-- ✅ Padding pentru a nu atinge marginea -->
-                            </Border>
+                            <!-- ✅ PARTEA DE JOS: GESTIUNE (STÂNGA) + PREȚ (DREAPTA) -->
+                            <Grid Grid.Row="2" Margin="2,0,2,2">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="Auto"/>
+                                    <!-- Gestiune -->
+                                    <ColumnDefinition Width="*"/>
+                                    <!-- Spațiu gol -->
+                                    <ColumnDefinition Width="Auto"/>
+                                    <!-- Preț -->
+                                </Grid.ColumnDefinitions>
+
+                                <!-- ✅ NUMELE GESTIUNII (STÂNGA) -->
+                                <Border Grid.Column="0"
+                                        CornerRadius="2"
+                                        Padding="3,1"
+                                        Margin="0,0,2,0"
+                                        VerticalAlignment="Center">
+                                    <Border.Style>
+                                        <Style TargetType="Border">
+                                            <Style.Triggers>
+                                                <!-- Ascunde dacă GestiuneName este gol -->
+                                                <DataTrigger Binding="{Binding RelativeSource={RelativeSource TemplatedParent}, Path=GestiuneName}" Value="">
+                                                    <Setter Property="Visibility" Value="Collapsed"/>
+                                                </DataTrigger>
+                                                <DataTrigger Binding="{Binding RelativeSource={RelativeSource TemplatedParent}, Path=GestiuneName}" Value="{x:Null}">
+                                                    <Setter Property="Visibility" Value="Collapsed"/>
+                                                </DataTrigger>
+                                            </Style.Triggers>
+                                        </Style>
+                                    </Border.Style>
+
+                                    <TextBlock Text="{TemplateBinding GestiuneName}"
+                                               Foreground="White"
+                                               FontSize="9"
+                                               FontWeight="Bold"
+                                               TextAlignment="Left"/>
+                                </Border>
+
+                                <!-- ✅ PREȚ (DREAPTA) -->
+                                <Border Grid.Column="2"
+                                        Padding="0"
+                                        VerticalAlignment="Center">
+                                    <TextBlock Text="{TemplateBinding Price}"
+                                               Foreground="White"
+                                               FontSize="10"
+                                               FontWeight="Bold"
+                                               TextAlignment="Right"
+                                               Margin="0,0,4,0"
+                                               Padding="2,1"/>
+                                </Border>
+                            </Grid>
 
                         </Grid>
                     </Border>

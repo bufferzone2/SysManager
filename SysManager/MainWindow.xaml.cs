@@ -95,9 +95,10 @@ namespace SysManager
                 }
 
                 // ✅ ÎNCARCĂ DATELE
+                
                 CalculateLayout();
-                LoadGroups();
                 LoadGestiuni();
+                LoadGroups();
                 LoadProducts();
             }, System.Windows.Threading.DispatcherPriority.Loaded);
         }
@@ -200,6 +201,7 @@ namespace SysManager
                     }
 
                     LoadGroups();
+                    LoadProducts();
                 }
             }
             catch (Exception ex)

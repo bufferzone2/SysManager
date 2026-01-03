@@ -151,6 +151,7 @@ namespace SysManager
                 // ✅ RECALCULEAZĂ LAYOUT ÎNAINTE de a crea butoanele
                 CalculateProductLayout();
 
+
                 // ✅ CREEAZĂ BUTOANE PENTRU FIECARE PRODUS
                 foreach (var produs in produse)
                 {
@@ -162,6 +163,7 @@ namespace SysManager
                         Width = _produseSettings.Latime,
                         Height = _produseSettings.Inaltime,
                         Margin = new Thickness(1, 1, 1, 1), // ✅ Margin asimetric pentru border vizibil pe dreapta/jos
+                        GestiuneName = produs.NumeGestiune, // ✅ SETEAZĂ NUMELE GESTIUNII
                         Tag = produs
                     };
 
@@ -601,6 +603,7 @@ namespace SysManager
                 // ✅ RECALCULEAZĂ LAYOUT
                 CalculateProductLayout();
 
+
                 // ✅ CREEAZĂ BUTOANE PENTRU FIECARE PRODUS (CU CULOARE VERDE PENTRU REZULTATE CĂUTARE!)
                 foreach (var produs in produse)
                 {
@@ -612,6 +615,7 @@ namespace SysManager
                         Width = _produseSettings.Latime,
                         Height = _produseSettings.Inaltime,
                         Margin = new Thickness(1, 1, 1, 1),
+                        GestiuneName = produs.NumeGestiune, // ✅ SETEAZĂ NUMELE GESTIUNII
                         Tag = produs
                     };
 

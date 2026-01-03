@@ -324,7 +324,8 @@ namespace SysManager
                                 CodSGR = reader.IsDBNull(8) ? null : reader.GetString(8).Trim(),     // COD_SGR
                                 UnitateMasura = reader.IsDBNull(9) ? "buc" : reader.GetString(9).Trim(), // U_MASURA
                                 Departament = reader.GetInt32(10),                          // ID_DEP
-                                TvaAmefId = reader.GetInt32(11)                             // ID_TVA_AMEF
+                                TvaAmefId = reader.GetInt32(11),                             // ID_TVA_AMEF
+                                NumeGestiune = reader.GetString(13).Trim()                  // NUME GESTIUNE
                             });
                         }
                     }
@@ -385,7 +386,8 @@ namespace SysManager
                                 CodSGR = reader.IsDBNull(8) ? null : reader.GetString(8).Trim(),     // COD_SGR
                                 UnitateMasura = reader.IsDBNull(9) ? "buc" : reader.GetString(9).Trim(), // U_MASURA
                                 Departament = reader.GetInt32(10),                          // ID_DEP (✅ INT32, nu INT16!)
-                                TvaAmefId = reader.GetInt32(11)                             // ID_TVA_AMEF (✅ INT32, nu INT16!)
+                                TvaAmefId = reader.GetInt32(11),                             // ID_TVA_AMEF (✅ INT32, nu INT16!)
+                                NumeGestiune = reader.GetString(13).Trim()                  // NUME GESTIUNE
                             };
 
                             produse.Add(produs);

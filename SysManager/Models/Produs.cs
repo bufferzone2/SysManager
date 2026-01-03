@@ -16,6 +16,9 @@ namespace SysManager.Models
         public int Departament { get; set; }        // ID departament
         public int TvaAmefId { get; set; }          // ID TVA AMEF
 
+        // ✅ PROPRIETATE NOUĂ: Numele gestiunii
+        public string NumeGestiune { get; set; }
+
         // Proprietăți calculate pentru afișare
         public string PretFormatat => $"{Pret:F2} RON";
         public string StocFormatat => "N/A"; // Dacă ai stoc, calculează aici

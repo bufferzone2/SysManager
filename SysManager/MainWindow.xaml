@@ -393,10 +393,9 @@
                              Background="Transparent"
                              Height="32"
                              Padding="8,0"
-                             TextChanged="TxtCautareArticolBon_TextChanged">
-                             ToolTip="Caută articol după denumire sau cod pentru BON">
+                             TextChanged="TxtCautareArticolBon_TextChanged" ToolTip="Caută articol după denumire sau cod" Text="Caută articol după denumire sau cod">
                                 <TextBox.Style>
-                                    <Style TargetType="TextBox">
+                                    <Style TargetType="{x:Type TextBox}">
                                         <Style.Triggers>
                                             <Trigger Property="Text" Value="">
                                                 <Setter Property="Background">
