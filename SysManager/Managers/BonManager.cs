@@ -108,6 +108,7 @@ namespace SysManager.Managers
 
         /// <summary>
         /// Adaugă sau incrementează produsul în bonul curent
+        /// ✅ MODIFICAT: Folosește PretBrut (cu TVA) pentru calcul, NU Pret (fără TVA)!
         /// </summary>
         /// <param name="produs">Produsul de adăugat</param>
         /// <param name="cantitate">Cantitatea (default: 1)</param>
@@ -137,14 +138,15 @@ namespace SysManager.Managers
             else
             {
                 // ✅ Produs NOU → ADAUGĂ în bon
+                // ⚠️ MODIFICARE CRITICĂ: Folosim PretBrut (cu TVA), NU Pret (fără TVA)!
                 var bonItem = new BonItem
                 {
                     IdProdus = produs.Id,
                     Nume = produs.Denumire,
                     Cantitate = cantitate,
-                    Pret = produs.Pret,
-                    PretBrut = produs.PretBrut,
-                    TvaValoare = produs.TvaValoare,
+                    ValoareTva = produs.ValoareTva,         // Valoare tva produs
+                    PretBrut = produs.PretBrut,             // Pret brut
+                    ProcentTva = produs.ProcentTva,         // Procent tva
                     TvaId = produs.TvaId,
                     CodSGR = produs.CodSGR,
                     UnitateMasura = produs.UnitateMasura,
@@ -156,7 +158,7 @@ namespace SysManager.Managers
 
                 Items.Add(bonItem);
 
-                Logs.Write($"✅ Produs NOU adăugat: {bonItem.Nume} - {bonItem.Cantitate} × {bonItem.Pret:F2} LEI = {bonItem.Total:F2} LEI");
+                Logs.Write($"✅ Produs NOU adăugat: {bonItem.Nume} - {bonItem.Cantitate} × {bonItem.PretBrut:F2} LEI = {bonItem.Total:F2} LEI");
 
                 ProdusAdaugat?.Invoke(this, bonItem);
                 return bonItem;
@@ -326,7 +328,7 @@ namespace SysManager.Managers
         /// </summary>
         public decimal CalculeazaTVATotal()
         {
-            return Items.Sum(item => item.TvaValoare * item.Cantitate);
+            return Items.Sum(item => item.ValoareTva * item.Cantitate);
         }
 
         /// <summary>
@@ -343,10 +345,14 @@ namespace SysManager.Managers
 
         /// <summary>
         /// Recalculează totalul bonului
+        /// ✅ MODIFICAT: Folosește Total (care e calculat din Cantitate × Pret, 
+        /// iar Pret e acum PretBrut)
         /// </summary>
         private void RecalculeazaTotal()
         {
-            Total = Items.Sum(item => item.PretBrut);
+            // ✅ Total se calculează automat în BonItem.Total (Cantitate × Pret)
+            // Pret este acum setat la PretBrut (cu TVA), deci totalul va fi corect
+            Total = Items.Sum(item => item.Total);
 
             Logs.Write($"💰 Total bon actualizat: {Total:F2} LEI ({NumarArticole} articole, {NumarBucati} bucăți)");
         }
@@ -358,7 +364,7 @@ namespace SysManager.Managers
         {
             if (e.PropertyName == nameof(BonItem.Total) ||
                 e.PropertyName == nameof(BonItem.Cantitate) ||
-                e.PropertyName == nameof(BonItem.Pret))
+                e.PropertyName == nameof(BonItem.PretBrut))
             {
                 RecalculeazaTotal();
 

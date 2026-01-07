@@ -73,6 +73,7 @@
             </Setter.Value>
         </Setter>
     </Style>
+
     <!-- ============================================ -->
     <!-- STILUL PENTRU GestiuneButton                 -->
     <!-- ============================================ -->
@@ -127,6 +128,7 @@
             </Setter.Value>
         </Setter>
     </Style>
+
     <!-- ============================================ -->
     <!-- STILUL PENTRU POSButton (BUTOANE PRODUSE)    -->
     <!-- ✅ CU NUMELE GESTIUNII ÎN PARTEA STÂNGĂ      -->
@@ -260,6 +262,518 @@
                             <Setter TargetName="border" Property="Opacity" Value="0.5"/>
                         </Trigger>
                     </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <!-- ============================================ -->
+    <!-- STILURI BUTOANE PENTRU NUMERIC KEYPAD        -->
+    <!-- ✅ IMPORTANT: TREBUIE SĂ FIE ÎNAINTE DE NumericKeypad! -->
+    <!-- ============================================ -->
+
+    <!-- Stil butoane numerice (0-9, punct) -->
+    <Style x:Key="NumericButtonStyle" TargetType="Button">
+        <Setter Property="Background" Value="#0066CC"/>
+        <Setter Property="Foreground" Value="White"/>
+        <Setter Property="FontSize" Value="28"/>
+        <Setter Property="FontWeight" Value="Bold"/>
+        <Setter Property="Margin" Value="3"/>
+        <Setter Property="BorderThickness" Value="0"/>
+        <Setter Property="Cursor" Value="Hand"/>
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="Button">
+                    <Border x:Name="border"
+                        Background="{TemplateBinding Background}"
+                        CornerRadius="6"
+                        SnapsToDevicePixels="True">
+                        <ContentPresenter HorizontalAlignment="Center" 
+                                      VerticalAlignment="Center"/>
+                    </Border>
+                    <ControlTemplate.Triggers>
+                        <Trigger Property="IsMouseOver" Value="True">
+                            <Setter TargetName="border" Property="Background" Value="#0052B8"/>
+                        </Trigger>
+                        <Trigger Property="IsPressed" Value="True">
+                            <Setter TargetName="border" Property="Background" Value="#003D82"/>
+                        </Trigger>
+                        <Trigger Property="IsEnabled" Value="False">
+                            <Setter TargetName="border" Property="Background" Value="#CCCCCC"/>
+                            <Setter Property="Foreground" Value="#999999"/>
+                        </Trigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <!-- Stil butoane funcții (Backspace, Clear, Minus) -->
+    <Style x:Key="FunctionButtonStyle" TargetType="Button">
+        <Setter Property="Background" Value="#FF9800"/>
+        <Setter Property="Foreground" Value="White"/>
+        <Setter Property="FontSize" Value="24"/>
+        <Setter Property="FontWeight" Value="Bold"/>
+        <Setter Property="Margin" Value="3"/>
+        <Setter Property="BorderThickness" Value="0"/>
+        <Setter Property="Cursor" Value="Hand"/>
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="Button">
+                    <Border x:Name="border"
+                        Background="{TemplateBinding Background}"
+                        CornerRadius="6"
+                        SnapsToDevicePixels="True">
+                        <ContentPresenter HorizontalAlignment="Center" 
+                                      VerticalAlignment="Center"/>
+                    </Border>
+                    <ControlTemplate.Triggers>
+                        <Trigger Property="IsMouseOver" Value="True">
+                            <Setter TargetName="border" Property="Background" Value="#F57C00"/>
+                        </Trigger>
+                        <Trigger Property="IsPressed" Value="True">
+                            <Setter TargetName="border" Property="Background" Value="#E65100"/>
+                        </Trigger>
+                        <Trigger Property="IsEnabled" Value="False">
+                            <Setter TargetName="border" Property="Background" Value="#CCCCCC"/>
+                            <Setter Property="Foreground" Value="#999999"/>
+                        </Trigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <!-- Stil buton Enter (verde, mai mare) -->
+    <Style x:Key="EnterButtonStyle" TargetType="Button">
+        <Setter Property="Background" Value="#4CAF50"/>
+        <Setter Property="Foreground" Value="White"/>
+        <Setter Property="FontSize" Value="32"/>
+        <Setter Property="FontWeight" Value="Bold"/>
+        <Setter Property="Margin" Value="3"/>
+        <Setter Property="BorderThickness" Value="0"/>
+        <Setter Property="Cursor" Value="Hand"/>
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="Button">
+                    <Border x:Name="border"
+                        Background="{TemplateBinding Background}"
+                        CornerRadius="6"
+                        SnapsToDevicePixels="True">
+                        <ContentPresenter HorizontalAlignment="Center" 
+                                      VerticalAlignment="Center"/>
+                    </Border>
+                    <ControlTemplate.Triggers>
+                        <Trigger Property="IsMouseOver" Value="True">
+                            <Setter TargetName="border" Property="Background" Value="#43A047"/>
+                        </Trigger>
+                        <Trigger Property="IsPressed" Value="True">
+                            <Setter TargetName="border" Property="Background" Value="#2E7D32"/>
+                        </Trigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <!-- Stil buton Cancel (roșu) -->
+    <Style x:Key="CancelButtonStyle" TargetType="Button">
+        <Setter Property="Background" Value="#E53935"/>
+        <Setter Property="Foreground" Value="White"/>
+        <Setter Property="FontSize" Value="18"/>
+        <Setter Property="FontWeight" Value="Bold"/>
+        <Setter Property="Margin" Value="3"/>
+        <Setter Property="BorderThickness" Value="0"/>
+        <Setter Property="Cursor" Value="Hand"/>
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="Button">
+                    <Border x:Name="border"
+                        Background="{TemplateBinding Background}"
+                        CornerRadius="6"
+                        SnapsToDevicePixels="True">
+                        <ContentPresenter HorizontalAlignment="Center" 
+                                      VerticalAlignment="Center"/>
+                    </Border>
+                    <ControlTemplate.Triggers>
+                        <Trigger Property="IsMouseOver" Value="True">
+                            <Setter TargetName="border" Property="Background" Value="#D32F2F"/>
+                        </Trigger>
+                        <Trigger Property="IsPressed" Value="True">
+                            <Setter TargetName="border" Property="Background" Value="#C62828"/>
+                        </Trigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <!-- ============================================ -->
+    <!-- STILUL PENTRU NumericKeypad                  -->
+    <!-- ✅ TREBUIE SĂ FIE DUPĂ STILURILE BUTOANELOR! -->
+    <!-- ============================================ -->
+    <Style TargetType="{x:Type local:NumericKeypad}">
+        <Setter Property="Background" Value="#F5F5F5"/>
+        <Setter Property="BorderBrush" Value="#CCCCCC"/>
+        <Setter Property="BorderThickness" Value="1"/>
+        <Setter Property="Width" Value="320"/>
+        <Setter Property="Height" Value="320"/>
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="{x:Type local:NumericKeypad}">
+                    <Border Background="{TemplateBinding Background}"
+                    BorderBrush="{TemplateBinding BorderBrush}"
+                    BorderThickness="{TemplateBinding BorderThickness}"
+                    CornerRadius="8"
+                    Padding="0">
+                        <Grid>
+                            <Grid.RowDefinitions>
+                                <!-- 4 rânduri pentru butoane -->
+                                <RowDefinition Height="*"/>
+                                <RowDefinition Height="*"/>
+                                <RowDefinition Height="*"/>
+                                <RowDefinition Height="*"/>
+                            </Grid.RowDefinitions>
+                            <Grid.ColumnDefinitions>
+                                <!-- 4 coloane -->
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="*"/>
+                            </Grid.ColumnDefinitions>
+
+                            <!-- ═══════════════════════════════════════ -->
+                            <!-- RÂNDUL 1: 7, 8, 9, BACKSPACE -->
+                            <!-- ═══════════════════════════════════════ -->
+                            <Button x:Name="Btn7" Grid.Row="0" Grid.Column="0" 
+                                Content="7" Style="{StaticResource NumericButtonStyle}"/>
+                            <Button x:Name="Btn8" Grid.Row="0" Grid.Column="1" 
+                                Content="8" Style="{StaticResource NumericButtonStyle}"/>
+                            <Button x:Name="Btn9" Grid.Row="0" Grid.Column="2" 
+                                Content="9" Style="{StaticResource NumericButtonStyle}"/>
+                            <Button x:Name="BtnBackspace" Grid.Row="0" Grid.Column="3" 
+                                Content="⌫" Style="{StaticResource FunctionButtonStyle}"/>
+
+                            <!-- ═══════════════════════════════════════ -->
+                            <!-- RÂNDUL 2: 4, 5, 6, CLEAR -->
+                            <!-- ═══════════════════════════════════════ -->
+                            <Button x:Name="Btn4" Grid.Row="1" Grid.Column="0" 
+                                Content="4" Style="{StaticResource NumericButtonStyle}"/>
+                            <Button x:Name="Btn5" Grid.Row="1" Grid.Column="1" 
+                                Content="5" Style="{StaticResource NumericButtonStyle}"/>
+                            <Button x:Name="Btn6" Grid.Row="1" Grid.Column="2" 
+                                Content="6" Style="{StaticResource NumericButtonStyle}"/>
+                            <Button x:Name="BtnClear" Grid.Row="1" Grid.Column="3" 
+                                Content="C" Style="{StaticResource FunctionButtonStyle}"/>
+
+                            <!-- ═══════════════════════════════════════ -->
+                            <!-- RÂNDUL 3: 1, 2, 3, MINUS -->
+                            <!-- ═══════════════════════════════════════ -->
+                            <Button x:Name="Btn1" Grid.Row="2" Grid.Column="0" 
+                                Content="1" Style="{StaticResource NumericButtonStyle}"/>
+                            <Button x:Name="Btn2" Grid.Row="2" Grid.Column="1" 
+                                Content="2" Style="{StaticResource NumericButtonStyle}"/>
+                            <Button x:Name="Btn3" Grid.Row="2" Grid.Column="2" 
+                                Content="3" Style="{StaticResource NumericButtonStyle}"/>
+                            <Button x:Name="BtnMinus" Grid.Row="2" Grid.Column="3" 
+                                Content="+/-" Style="{StaticResource FunctionButtonStyle}"/>
+
+                            <!-- ═══════════════════════════════════════ -->
+                            <!-- RÂNDUL 4: 0, PUNCT, ENTER, CANCEL -->
+                            <!-- ═══════════════════════════════════════ -->
+                            <Button x:Name="Btn0" Grid.Row="3" Grid.Column="0" 
+                                Content="0" Style="{StaticResource NumericButtonStyle}"/>
+                            <Button x:Name="BtnDot" Grid.Row="3" Grid.Column="1" 
+                                Content="." Style="{StaticResource NumericButtonStyle}"/>
+                            <Button x:Name="BtnEnter" Grid.Row="3" Grid.Column="2" 
+                                Content="✓" Style="{StaticResource EnterButtonStyle}"/>
+                            <Button x:Name="BtnCancel" Grid.Row="3" Grid.Column="3" 
+                                Content="ANULARE" Style="{StaticResource CancelButtonStyle}"/>
+                        </Grid>
+                    </Border>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <!-- Adaugă acest stil în Generic.xaml, după stilul pentru NumericKeypad -->
+
+    <!-- ============================================ -->
+    <!-- STILURI PENTRU BUTOANE SearchKeypad          -->
+    <!-- ============================================ -->
+
+    <!-- Stil buton literă/cifră (alb) -->
+    <Style x:Key="KeyButtonStyle" TargetType="Button">
+        <Setter Property="Background" Value="#FFFFFF"/>
+        <Setter Property="Foreground" Value="#333333"/>
+        <Setter Property="FontSize" Value="16"/>
+        <Setter Property="FontWeight" Value="Bold"/>
+        <Setter Property="Margin" Value="2"/>
+        <Setter Property="BorderThickness" Value="1"/>
+        <Setter Property="BorderBrush" Value="#CCCCCC"/>
+        <Setter Property="Cursor" Value="Hand"/>
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="Button">
+                    <Border x:Name="border"
+                        Background="{TemplateBinding Background}"
+                        BorderBrush="{TemplateBinding BorderBrush}"
+                        BorderThickness="{TemplateBinding BorderThickness}"
+                        CornerRadius="4"
+                        SnapsToDevicePixels="True">
+                        <ContentPresenter HorizontalAlignment="Center" 
+                                      VerticalAlignment="Center"/>
+                    </Border>
+                    <ControlTemplate.Triggers>
+                        <Trigger Property="IsMouseOver" Value="True">
+                            <Setter TargetName="border" Property="Background" Value="#E3F2FD"/>
+                        </Trigger>
+                        <Trigger Property="IsPressed" Value="True">
+                            <Setter TargetName="border" Property="Background" Value="#BBDEFB"/>
+                        </Trigger>
+                        <Trigger Property="IsEnabled" Value="False">
+                            <Setter TargetName="border" Property="Background" Value="#F5F5F5"/>
+                            <Setter Property="Foreground" Value="#CCCCCC"/>
+                        </Trigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <!-- Stil buton funcție (gri) - Backspace, Clear, Caps, Shift -->
+    <Style x:Key="KeyFunctionButtonStyle" TargetType="Button" BasedOn="{StaticResource KeyButtonStyle}">
+        <Setter Property="Background" Value="#E0E0E0"/>
+        <Setter Property="Foreground" Value="#333333"/>
+        <Setter Property="FontSize" Value="14"/>
+    </Style>
+
+    <!-- Stil buton Spațiu (mai lat) -->
+    <Style x:Key="KeySpaceButtonStyle" TargetType="Button" BasedOn="{StaticResource KeyButtonStyle}">
+        <Setter Property="Background" Value="#F5F5F5"/>
+    </Style>
+
+    <!-- Stil buton Enter (verde) -->
+    <Style x:Key="KeyEnterButtonStyle" TargetType="Button">
+        <Setter Property="Background" Value="#4CAF50"/>
+        <Setter Property="Foreground" Value="White"/>
+        <Setter Property="FontSize" Value="16"/>
+        <Setter Property="FontWeight" Value="Bold"/>
+        <Setter Property="Margin" Value="2"/>
+        <Setter Property="BorderThickness" Value="0"/>
+        <Setter Property="Cursor" Value="Hand"/>
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="Button">
+                    <Border x:Name="border"
+                        Background="{TemplateBinding Background}"
+                        CornerRadius="4"
+                        SnapsToDevicePixels="True">
+                        <ContentPresenter HorizontalAlignment="Center" 
+                                      VerticalAlignment="Center"/>
+                    </Border>
+                    <ControlTemplate.Triggers>
+                        <Trigger Property="IsMouseOver" Value="True">
+                            <Setter TargetName="border" Property="Background" Value="#43A047"/>
+                        </Trigger>
+                        <Trigger Property="IsPressed" Value="True">
+                            <Setter TargetName="border" Property="Background" Value="#2E7D32"/>
+                        </Trigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <!-- Stil buton Cancel (roșu) -->
+    <Style x:Key="KeyCancelButtonStyle" TargetType="Button">
+        <Setter Property="Background" Value="#E53935"/>
+        <Setter Property="Foreground" Value="White"/>
+        <Setter Property="FontSize" Value="14"/>
+        <Setter Property="FontWeight" Value="Bold"/>
+        <Setter Property="Margin" Value="2"/>
+        <Setter Property="BorderThickness" Value="0"/>
+        <Setter Property="Cursor" Value="Hand"/>
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="Button">
+                    <Border x:Name="border"
+                        Background="{TemplateBinding Background}"
+                        CornerRadius="4"
+                        SnapsToDevicePixels="True">
+                        <ContentPresenter HorizontalAlignment="Center" 
+                                      VerticalAlignment="Center"/>
+                    </Border>
+                    <ControlTemplate.Triggers>
+                        <Trigger Property="IsMouseOver" Value="True">
+                            <Setter TargetName="border" Property="Background" Value="#D32F2F"/>
+                        </Trigger>
+                        <Trigger Property="IsPressed" Value="True">
+                            <Setter TargetName="border" Property="Background" Value="#C62828"/>
+                        </Trigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <!-- ============================================ -->
+    <!-- STILUL PENTRU SearchKeypad                   -->
+    <!-- ============================================ -->
+    <Style TargetType="{x:Type local:SearchKeypad}">
+        <Setter Property="Background" Value="#F5F5F5"/>
+        <Setter Property="BorderBrush" Value="#CCCCCC"/>
+        <Setter Property="BorderThickness" Value="1"/>
+        <Setter Property="Width" Value="700"/>
+        <Setter Property="Height" Value="320"/>
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="{x:Type local:SearchKeypad}">
+                    <Border Background="{TemplateBinding Background}"
+                        BorderBrush="{TemplateBinding BorderBrush}"
+                        BorderThickness="{TemplateBinding BorderThickness}"
+                        CornerRadius="8"
+                        Padding="5">
+                        <Grid>
+                            <Grid.RowDefinitions>
+                                <!-- Display -->
+                                <RowDefinition Height="50"/>
+                                <!-- 5 rânduri butoane -->
+                                <RowDefinition Height="*"/>
+                                <RowDefinition Height="*"/>
+                                <RowDefinition Height="*"/>
+                                <RowDefinition Height="*"/>
+                                <RowDefinition Height="*"/>
+                            </Grid.RowDefinitions>
+
+                            <!-- ═══════════════════════════════════════ -->
+                            <!-- DISPLAY TEXT -->
+                            <!-- ═══════════════════════════════════════ -->
+                            <Border Grid.Row="0"
+                                Background="White"
+                                BorderBrush="#0066CC"
+                                BorderThickness="2"
+                                CornerRadius="4"
+                                Margin="2">
+                                <TextBlock Text="{TemplateBinding CurrentText}"
+                                       FontSize="20"
+                                       FontWeight="Bold"
+                                       Foreground="#0066CC"
+                                       VerticalAlignment="Center"
+                                       Padding="10,0"
+                                       TextTrimming="CharacterEllipsis"/>
+                            </Border>
+
+                            <!-- ═══════════════════════════════════════ -->
+                            <!-- RÂNDUL 1: 1-9, 0, BACKSPACE -->
+                            <!-- ═══════════════════════════════════════ -->
+                            <UniformGrid Grid.Row="1" Rows="1" Columns="11">
+                                <Button x:Name="Btn1" Content="1" Style="{StaticResource KeyButtonStyle}"/>
+                                <Button x:Name="Btn2" Content="2" Style="{StaticResource KeyButtonStyle}"/>
+                                <Button x:Name="Btn3" Content="3" Style="{StaticResource KeyButtonStyle}"/>
+                                <Button x:Name="Btn4" Content="4" Style="{StaticResource KeyButtonStyle}"/>
+                                <Button x:Name="Btn5" Content="5" Style="{StaticResource KeyButtonStyle}"/>
+                                <Button x:Name="Btn6" Content="6" Style="{StaticResource KeyButtonStyle}"/>
+                                <Button x:Name="Btn7" Content="7" Style="{StaticResource KeyButtonStyle}"/>
+                                <Button x:Name="Btn8" Content="8" Style="{StaticResource KeyButtonStyle}"/>
+                                <Button x:Name="Btn9" Content="9" Style="{StaticResource KeyButtonStyle}"/>
+                                <Button x:Name="Btn0" Content="0" Style="{StaticResource KeyButtonStyle}"/>
+                                <Button x:Name="BtnBackspace" Content="⌫" Style="{StaticResource KeyFunctionButtonStyle}"/>
+                            </UniformGrid>
+
+                            <!-- ═══════════════════════════════════════ -->
+                            <!-- RÂNDUL 2: Q-P -->
+                            <!-- ═══════════════════════════════════════ -->
+                            <UniformGrid Grid.Row="2" Rows="1" Columns="11">
+                                <Button x:Name="BtnQ" Content="Q" Style="{StaticResource KeyButtonStyle}"/>
+                                <Button x:Name="BtnW" Content="W" Style="{StaticResource KeyButtonStyle}"/>
+                                <Button x:Name="BtnE" Content="E" Style="{StaticResource KeyButtonStyle}"/>
+                                <Button x:Name="BtnR" Content="R" Style="{StaticResource KeyButtonStyle}"/>
+                                <Button x:Name="BtnT" Content="T" Style="{StaticResource KeyButtonStyle}"/>
+                                <Button x:Name="BtnY" Content="Y" Style="{StaticResource KeyButtonStyle}"/>
+                                <Button x:Name="BtnU" Content="U" Style="{StaticResource KeyButtonStyle}"/>
+                                <Button x:Name="BtnI" Content="I" Style="{StaticResource KeyButtonStyle}"/>
+                                <Button x:Name="BtnO" Content="O" Style="{StaticResource KeyButtonStyle}"/>
+                                <Button x:Name="BtnP" Content="P" Style="{StaticResource KeyButtonStyle}"/>
+                                <Button x:Name="BtnClear" Content="C" Style="{StaticResource KeyFunctionButtonStyle}"/>
+                            </UniformGrid>
+
+                            <!-- ═══════════════════════════════════════ -->
+                            <!-- RÂNDUL 3: A-L + ENTER -->
+                            <!-- ═══════════════════════════════════════ -->
+                            <Grid Grid.Row="3">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="2*"/>
+                                    <!-- Enter mai lat -->
+                                </Grid.ColumnDefinitions>
+
+                                <Button x:Name="BtnA" Grid.Column="0" Content="A" Style="{StaticResource KeyButtonStyle}"/>
+                                <Button x:Name="BtnS" Grid.Column="1" Content="S" Style="{StaticResource KeyButtonStyle}"/>
+                                <Button x:Name="BtnD" Grid.Column="2" Content="D" Style="{StaticResource KeyButtonStyle}"/>
+                                <Button x:Name="BtnF" Grid.Column="3" Content="F" Style="{StaticResource KeyButtonStyle}"/>
+                                <Button x:Name="BtnG" Grid.Column="4" Content="G" Style="{StaticResource KeyButtonStyle}"/>
+                                <Button x:Name="BtnH" Grid.Column="5" Content="H" Style="{StaticResource KeyButtonStyle}"/>
+                                <Button x:Name="BtnJ" Grid.Column="6" Content="J" Style="{StaticResource KeyButtonStyle}"/>
+                                <Button x:Name="BtnK" Grid.Column="7" Content="K" Style="{StaticResource KeyButtonStyle}"/>
+                                <Button x:Name="BtnL" Grid.Column="8" Content="L" Style="{StaticResource KeyButtonStyle}"/>
+                                <Button x:Name="BtnEnter" Grid.Column="9" Content="🔍 CĂUTARE" Style="{StaticResource KeyEnterButtonStyle}"/>
+                            </Grid>
+
+                            <!-- ═══════════════════════════════════════ -->
+                            <!-- RÂNDUL 4: CAPS + Z-M + SHIFT -->
+                            <!-- ═══════════════════════════════════════ -->
+                            <Grid Grid.Row="4">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="1.5*"/>
+                                    <!-- Caps mai lat -->
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="1.5*"/>
+                                    <!-- Shift mai lat -->
+                                </Grid.ColumnDefinitions>
+
+                                <Button x:Name="BtnCaps" Grid.Column="0" Content="CAPS" Style="{StaticResource KeyFunctionButtonStyle}"/>
+                                <Button x:Name="BtnZ" Grid.Column="1" Content="Z" Style="{StaticResource KeyButtonStyle}"/>
+                                <Button x:Name="BtnX" Grid.Column="2" Content="X" Style="{StaticResource KeyButtonStyle}"/>
+                                <Button x:Name="BtnC" Grid.Column="3" Content="C" Style="{StaticResource KeyButtonStyle}"/>
+                                <Button x:Name="BtnV" Grid.Column="4" Content="V" Style="{StaticResource KeyButtonStyle}"/>
+                                <Button x:Name="BtnB" Grid.Column="5" Content="B" Style="{StaticResource KeyButtonStyle}"/>
+                                <Button x:Name="BtnN" Grid.Column="6" Content="N" Style="{StaticResource KeyButtonStyle}"/>
+                                <Button x:Name="BtnM" Grid.Column="7" Content="M" Style="{StaticResource KeyButtonStyle}"/>
+                                <Button x:Name="BtnShift" Grid.Column="8" Content="SHIFT" Style="{StaticResource KeyFunctionButtonStyle}"/>
+                            </Grid>
+
+                            <!-- ═══════════════════════════════════════ -->
+                            <!-- RÂNDUL 5: SPAȚIU + ANULARE -->
+                            <!-- ═══════════════════════════════════════ -->
+                            <Grid Grid.Row="5">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="3*"/>
+                                    <!-- Spațiu foarte lat -->
+                                    <ColumnDefinition Width="*"/>
+                                    <!-- Anulare -->
+                                </Grid.ColumnDefinitions>
+
+                                <Button x:Name="BtnSpace" Grid.Column="0" Content="SPAȚIU" Style="{StaticResource KeySpaceButtonStyle}"/>
+                                <Button x:Name="BtnCancel" Grid.Column="1" Content="ANULARE" Style="{StaticResource KeyCancelButtonStyle}"/>
+                            </Grid>
+
+                        </Grid>
+                    </Border>
                 </ControlTemplate>
             </Setter.Value>
         </Setter>

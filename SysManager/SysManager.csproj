@@ -65,6 +65,8 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="Controls\NumericKeypad.cs" />
+    <Compile Include="Controls\SearchKeypad.cs" />
     <Compile Include="Managers\BonManager.cs" />
     <Compile Include="Managers\BonuriAsteptareManager.cs" />
     <Compile Include="Models\BonAsteptare.cs" />
@@ -87,6 +89,12 @@
     <Compile Include="NullToVisibilityConverter.cs" />
     <Compile Include="SplashScreen.xaml.cs">
       <DependentUpon>SplashScreen.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Windows\NumericKeypadWindow.xaml.cs">
+      <DependentUpon>NumericKeypadWindow.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Windows\SearchKeypadWindow.xaml.cs">
+      <DependentUpon>SearchKeypadWindow.xaml</DependentUpon>
     </Compile>
     <Page Include="Windows\BonuriAsteptareWindow.xaml">
       <SubType>Designer</SubType>
@@ -112,6 +120,14 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="Themes\Generic.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Windows\NumericKeypadWindow.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Windows\SearchKeypadWindow.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

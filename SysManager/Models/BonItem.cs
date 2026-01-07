@@ -51,28 +51,23 @@ namespace SysManager.Models
             }
         }
 
-        private decimal _pret;
+        private decimal _valoaretva;
         /// <summary>
-        /// Prețul unitar fara TVA
+        /// Valoare tva produs
         /// </summary>
-        public decimal Pret
+        public decimal ValoareTva
         {
-            get => _pret;
+            get => _valoaretva;
             set
             {
-                if (_pret != value)
+                if (_valoaretva != value)
                 {
-                    _pret = value;
-                    OnPropertyChanged(nameof(Pret));
-                    OnPropertyChanged(nameof(Total)); // ✅ Recalculează automat totalul
+                    _valoaretva = value;
+                    OnPropertyChanged(nameof(ValoareTva));
                 }
             }
         }
 
-        /// <summary>
-        /// Totalul pentru această linie (Cantitate × Preț)
-        /// </summary>
-        public decimal Total => Cantitate * Pret;
 
         // ═══════════════════════════════════════════════════════════════
         // PROPRIETĂȚI SUPLIMENTARE (TVA, DEPARTAMENT, ETC.)
@@ -91,32 +86,34 @@ namespace SysManager.Models
                 {
                     _pretBrut = value;
                     OnPropertyChanged(nameof(PretBrut));
+                    OnPropertyChanged(nameof(Total)); // ✅ Recalculează automat totalul
                 }
             }
         }
 
-        private decimal _tvaValoare;
+        /// <summary>
+        /// Totalul pentru această linie (Cantitate × PretBrut)
+        /// </summary>
+        public decimal Total => Cantitate * PretBrut;
+
+
+        private decimal _procentTva;
         /// <summary>
         /// Valoarea TVA pe unitate
         /// </summary>
-        public decimal TvaValoare
+        public decimal ProcentTva
         {
-            get => _tvaValoare;
+            get => _procentTva;
             set
             {
-                if (_tvaValoare != value)
+                if (_procentTva != value)
                 {
-                    _tvaValoare = value;
-                    OnPropertyChanged(nameof(TvaValoare));
-                    OnPropertyChanged(nameof(TotalTVA));
+                    _procentTva = value;
+                    OnPropertyChanged(nameof(ProcentTva));
                 }
             }
         }
 
-        /// <summary>
-        /// Total TVA pentru această linie
-        /// </summary>
-        public decimal TotalTVA => TvaValoare * Cantitate;
 
         private int? _tvaId;
         /// <summary>
@@ -267,7 +264,7 @@ namespace SysManager.Models
         /// </summary>
         public override string ToString()
         {
-            return $"{Nume} - {Cantitate} × {Pret:F2} LEI = {Total:F2} LEI";
+            return $"{Nume} - {Cantitate} × {PretBrut:F2} LEI = {Total:F2} LEI";
         }
 
         /// <summary>
@@ -280,9 +277,9 @@ namespace SysManager.Models
                 IdProdus = this.IdProdus,
                 Nume = this.Nume,
                 Cantitate = this.Cantitate,
-                Pret = this.Pret,
+                ValoareTva = this.ValoareTva,
                 PretBrut = this.PretBrut,
-                TvaValoare = this.TvaValoare,
+                ProcentTva = this.ProcentTva,
                 TvaId = this.TvaId,
                 CodSGR = this.CodSGR,
                 UnitateMasura = this.UnitateMasura,

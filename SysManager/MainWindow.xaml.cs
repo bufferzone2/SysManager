@@ -95,7 +95,7 @@ namespace SysManager
                 }
 
                 // ✅ ÎNCARCĂ DATELE
-                
+
                 CalculateLayout();
                 LoadGestiuni();
                 LoadGroups();
@@ -215,6 +215,98 @@ namespace SysManager
 
         #region === BON & ALTE FUNCȚII ===
 
+        /// <summary>
+        /// Click pe TextBox cantitate - deschide tastatura numerică CU UPDATE ÎN TIMP REAL
+        /// </summary>
+        private void TxtCantitateBon_MouseDown(object sender, MouseButtonEventArgs e)
+        {
+            // ✅ PREVINE COMPORTAMENTUL DEFAULT AL MOUSE-ULUI
+            e.Handled = true;
+
+            try
+            {
+                // Citește valoarea curentă din TextBox
+                decimal valoareCurenta = 1;
+                if (!string.IsNullOrWhiteSpace(TxtCantitateBon.Text))
+                {
+                    if (decimal.TryParse(TxtCantitateBon.Text.Replace(',', '.'),
+                        System.Globalization.NumberStyles.Any,
+                        System.Globalization.CultureInfo.InvariantCulture,
+                        out decimal val))
+                    {
+                        valoareCurenta = val;
+                    }
+                }
+                Logs.Write($"TxtCantitateBon_MouseDown: Valoare curentă = {valoareCurenta}");
+
+                // ✅ CALCULEAZĂ POZIȚIA PENTRU A AFIȘA FEREASTRA SUB TEXTBOX
+                Point textBoxPosition = TxtCantitateBon.PointToScreen(new Point(0, 0));
+                Point keypadPosition = new Point(
+                    textBoxPosition.X,
+                    textBoxPosition.Y + TxtCantitateBon.ActualHeight + 5
+                );
+
+                // Verifică să nu iasă fereastra în afara ecranului
+                double screenWidth = SystemParameters.PrimaryScreenWidth;
+                double screenHeight = SystemParameters.PrimaryScreenHeight;
+                double keypadWidth = 330;
+                double keypadHeight = 330;
+
+                if (keypadPosition.X + keypadWidth > screenWidth)
+                {
+                    keypadPosition.X = screenWidth - keypadWidth - 10;
+                }
+
+                if (keypadPosition.Y + keypadHeight > screenHeight)
+                {
+                    keypadPosition.Y = textBoxPosition.Y - keypadHeight - 5;
+                }
+
+                // ✅ DESCHIDE TASTATURA NUMERICĂ
+                decimal? nouaCantitate = Windows.NumericKeypadWindow.ShowDialog(
+                    this,
+                    TxtCantitateBon,
+                    valoareCurenta,
+                    "INTRODUCERE CANTITATE",
+                    keypadPosition
+                );
+
+                if (nouaCantitate.HasValue)
+                {
+                    TxtCantitateBon.Text = nouaCantitate.Value.ToString("F3");
+                    Logs.Write($"✅ Cantitate confirmată: {nouaCantitate.Value}");
+                    StatusText.Text = $"Cantitate setată: {nouaCantitate.Value}";
+                }
+                else
+                {
+                    Logs.Write("❌ Introducere cantitate anulată de utilizator");
+                }
+            }
+            catch (Exception ex)
+            {
+                Logs.Write("❌ EROARE la deschiderea tastaturii numerice:");
+                Logs.Write(ex);
+                MessageBox.Show($"Eroare la deschiderea tastaturii:\n{ex.Message}",
+                    "Eroare", MessageBoxButton.OK, MessageBoxImage.Error);
+            }
+        }
+
+        /// <summary>
+        /// Când TextBox-ul primește focus, selectează tot textul
+        /// </summary>
+        private void TxtCantitateBon_GotFocus(object sender, RoutedEventArgs e)
+        {
+            if (sender is TextBox textBox)
+            {
+                // Selectează tot textul
+                textBox.SelectAll();
+
+                // Previne re-selecția când dai click cu mouse-ul
+                // (altfel click-ul ar deselecta textul imediat)
+                //e.Handled = true;
+            }
+        }
+
         private void Clear_Click(object sender, RoutedEventArgs e)
         {
             _bonManager.GolesteBon();
@@ -227,10 +319,11 @@ namespace SysManager
         {
             StatusText.Text = "Procesare încasare...";
             Logs.Write("MainWindow: Încasare inițiată");
-            var bonuri = _bonuriAsteptareManager.GetBonuriInAsteptare(); 
-            var dialog = new BonuriAsteptareWindow(bonuri, _bonuriAsteptareManager); 
-            if (dialog.ShowDialog() == true) { 
-                IncarcaBonInGrid(dialog.BonSelectat); 
+            var bonuri = _bonuriAsteptareManager.GetBonuriInAsteptare();
+            var dialog = new BonuriAsteptareWindow(bonuri, _bonuriAsteptareManager);
+            if (dialog.ShowDialog() == true)
+            {
+                IncarcaBonInGrid(dialog.BonSelectat);
             }
         }
 
@@ -266,7 +359,7 @@ namespace SysManager
                         IdProdus = bonItem.IdProdus,
                         DenumireProdus = bonItem.Nume,
                         Cantitate = bonItem.Cantitate,
-                        PretUnitar = bonItem.Pret,
+                        PretUnitar = bonItem.PretBrut,
                         Valoare = bonItem.Total
                     });
                 }
@@ -325,7 +418,7 @@ namespace SysManager
                     {
                         Id = detaliu.IdProdus,
                         Denumire = detaliu.DenumireProdus,
-                        Pret = detaliu.PretUnitar,
+                        PretBrut = detaliu.PretUnitar,
                         // Completează și alte proprietăți necesare
                     };
 
@@ -394,9 +487,11 @@ namespace SysManager
         /// <summary>    
         /// Generează număr unic pentru bon    
         /// </summary>    
-        private string GenerareNrBon()    {        
-            return $"TEMP{DateTime.Now:yyyyMMddHHmmss}";    
+        private string GenerareNrBon()
+        {
+            return $"TEMP{DateTime.Now:yyyyMMddHHmmss}";
         }
         #endregion
+
     }
 }

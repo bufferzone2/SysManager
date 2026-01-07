@@ -265,6 +265,7 @@ namespace SysManager
 
         /// <summary>
         /// Handler pentru click pe buton produs - ADAUGĂ ÎN BON CU CANTITATEA DIN TEXTBOX
+        /// ✅ Citește cantitatea din TxtCantitateBon și calculează prețul total
         /// </summary>
         private void Product_Click(object sender, RoutedEventArgs e)
         {
@@ -272,7 +273,7 @@ namespace SysManager
 
             if (sender is POSButton btn && btn.Tag is Models.Produs produs)
             {
-                Logs.Write($"📦 Produs identificat: {produs.Denumire} (ID: {produs.Id}, Preț: {produs.Pret:F2} RON)");
+                Logs.Write($"📦 Produs identificat: {produs.Denumire} (ID: {produs.Id}, PretBrut: {produs.PretBrut:F2} RON cu TVA)");
 
                 try
                 {
@@ -284,13 +285,16 @@ namespace SysManager
                     }
 
                     // ═══════════════════════════════════════════════════════════════
-                    // ✅ CITEȘTE CANTITATEA DIN TEXTBOX
+                    // ✅ CITEȘTE CANTITATEA DIN TxtCantitateBon
                     // ═══════════════════════════════════════════════════════════════
                     decimal cantitate = 1; // valoare implicită
 
                     if (!string.IsNullOrWhiteSpace(TxtCantitateBon.Text))
                     {
-                        if (decimal.TryParse(TxtCantitateBon.Text.Replace(',', '.'),
+                        // ✅ Suportă atât virgulă cât și punct ca separator zecimal
+                        string cantitateText = TxtCantitateBon.Text.Replace(',', '.');
+
+                        if (decimal.TryParse(cantitateText,
                             System.Globalization.NumberStyles.Any,
                             System.Globalization.CultureInfo.InvariantCulture,
                             out decimal cantitateInput))
@@ -298,24 +302,44 @@ namespace SysManager
                             if (cantitateInput > 0)
                             {
                                 cantitate = cantitateInput;
+                                Logs.Write($"✅ Cantitate citită din TxtCantitateBon: {cantitate}");
                             }
                             else
                             {
+                                Logs.Write($"⚠️ Cantitate invalidă ({cantitateInput}), folosim 1");
                                 TxtCantitateBon.Text = "1";
                                 cantitate = 1;
                             }
                         }
                         else
                         {
+                            Logs.Write($"⚠️ Parse failed pentru '{TxtCantitateBon.Text}', folosim 1");
                             TxtCantitateBon.Text = "1";
                             cantitate = 1;
                         }
                     }
+                    else
+                    {
+                        Logs.Write("⚠️ TxtCantitateBon gol, folosim cantitate = 1");
+                        cantitate = 1;
+                    }
+
+                    // ═══════════════════════════════════════════════════════════════
+                    // ✅ CALCULEAZĂ PREȚUL TOTAL: cantitate × preț_unitar
+                    // IMPORTANT: Folosim PretBrut (cu TVA) pentru calcul, NU Pret (fără TVA)!
+                    // Exemplu: 0.520 × 10 = 5.20 RON
+                    // ═══════════════════════════════════════════════════════════════
+                    decimal pretBrutTotal = cantitate * produs.PretBrut;
+
+                    Logs.Write($"💵 Calcul preț cu TVA (BRUT): {cantitate} × {produs.PretBrut:F2} = {pretBrutTotal:F2} RON ✅");
 
                     // ═══════════════════════════════════════════════════════════════
                     // ✅ ADAUGĂ PRODUSUL ÎN BON CU CANTITATEA SPECIFICATĂ
+                    // BonManager va înmulți automat cantitatea cu prețul unitar
                     // ═══════════════════════════════════════════════════════════════
                     var bonItem = _bonManager.AdaugaProdus(produs, cantitate);
+
+                    Logs.Write($"✅ Produs adăugat în bon: {produs.Denumire} × {cantitate} = {bonItem.Total:F2} RON");
 
                     // ═══════════════════════════════════════════════════════════════
                     // ✅ ACTUALIZEAZĂ TOTALUL ÎN UI

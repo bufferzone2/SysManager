@@ -359,24 +359,30 @@
                             <!-- Căutare -->
                         </Grid.ColumnDefinitions>
 
-                        <!-- ✅ TEXTBOX CANTITATE BON -->
+                        <!-- TextBox Cantitate BON - Click pentru Tastatură Numerică -->
+                        <!-- TextBox Cantitate BON - Click pentru Tastatură Numerică -->
                         <Border Grid.Column="0" 
-                        Background="White" 
-                        BorderBrush="#0066CC" 
-                        BorderThickness="2" 
-                        CornerRadius="2"
-                        Margin="0,0,4,0">
+        Background="White" 
+        BorderBrush="#0066CC" 
+        BorderThickness="2" 
+        CornerRadius="2"
+        Margin="0,0,4,0"
+        Cursor="Hand"
+        MouseDown="TxtCantitateBon_MouseDown"
+        ToolTip="Click pentru a introduce cantitatea">
                             <TextBox x:Name="TxtCantitateBon"
-                             Text="1"
-                             FontSize="16"
-                             FontWeight="Bold"
-                             Foreground="#0066CC"
-                             TextAlignment="Center"
-                             VerticalContentAlignment="Center"
-                             BorderThickness="0"
-                             Background="Transparent"
-                             Height="32"
-                             ToolTip="Cantitate articol pentru BON"/>
+             Text="1.000"
+             FontSize="16"
+             FontWeight="Bold"
+             Foreground="#0066CC"
+             TextAlignment="Center"
+             VerticalContentAlignment="Center"
+             BorderThickness="0"
+             Background="Transparent"
+             Height="32"
+             IsReadOnly="True"
+             Cursor="Hand"
+             Focusable="False"/>
                         </Border>
 
                         <!-- ✅ TEXTBOX CĂUTARE ARTICOL BON -->
@@ -462,7 +468,7 @@
 
                         <!-- ✅ Coloana Total - 2 ZECIMALE (ex: 45.00) -->
                         <DataGridTextColumn Header="Total" 
-                            Binding="{Binding PretBrut, StringFormat={}{0:F2}}" 
+                            Binding="{Binding Total, StringFormat={}{0:F2}}" 
                             Width="80" 
                             IsReadOnly="True">
                             <DataGridTextColumn.ElementStyle>

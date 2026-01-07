@@ -315,9 +315,9 @@ namespace SysManager
                             {
                                 Id = reader.GetInt32(0),                                    // ID
                                 Denumire = reader.GetString(1).Trim(),                      // NUME
-                                Pret = reader.GetDecimal(2),                                // PRET
+                                ValoareTva = reader.GetDecimal(2),                          // VALOARE TVA PRODUS
                                 PretBrut = reader.GetDecimal(3),                            // BRUT
-                                TvaValoare = reader.GetDecimal(4),                          // TVA
+                                ProcentTva = reader.GetDecimal(4),                          // PROCENTUL TVA
                                 CaleImagine = reader.IsDBNull(5) ? null : reader.GetString(5).Trim(), // CALE_IMAGE
                                 ShowImage = reader.GetInt32(6),                             // SHOW_IMAGE
                                 TvaId = reader.GetInt32(7),                                 // TVA_ID
@@ -377,9 +377,9 @@ namespace SysManager
                             {
                                 Id = reader.GetInt32(0),                                    // ID
                                 Denumire = reader.GetString(1).Trim(),                      // NUME
-                                Pret = reader.GetDecimal(2),                                // PRET
+                                ValoareTva = reader.GetDecimal(2),                          // VALOARE TVA PRODUS
                                 PretBrut = reader.GetDecimal(3),                            // BRUT
-                                TvaValoare = reader.GetDecimal(4),                          // TVA
+                                ProcentTva = reader.GetDecimal(4),                          // PROCENTUL TVA
                                 CaleImagine = reader.IsDBNull(5) ? null : reader.GetString(5).Trim(), // CALE_IMAGE
                                 ShowImage = reader.GetInt32(6),                             // SHOW_IMAGE (✅ INT32, nu INT16!)
                                 TvaId = reader.GetInt32(7),                                 // TVA_ID
