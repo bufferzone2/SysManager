@@ -4,14 +4,17 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:controls="clr-namespace:SysManager.Controls"
         Title="Căutare Articol"
-        Width="720"
-        Height="380"
-        WindowStartupLocation="CenterOwner"
+        Width="730"
+        Height="230"
+        WindowStartupLocation="Manual"
         WindowStyle="None"
         AllowsTransparency="True"
         Background="Transparent"
         ResizeMode="NoResize"
-        ShowInTaskbar="False">
+        ShowInTaskbar="False"
+        Topmost="True"
+        Loaded="Window_Loaded"
+        Deactivated="Window_Deactivated">
 
     <Border Background="#F5F5F5"
             BorderBrush="#0066CC"
@@ -25,7 +28,7 @@
                               BlurRadius="10"/>
         </Border.Effect>
 
-        <Grid Margin="0">
+        <Grid Margin="10">
             <Grid.RowDefinitions>
                 <RowDefinition Height="*"/>
                 <!-- Keypad -->
@@ -36,9 +39,9 @@
             <!-- ═══════════════════════════════════════ -->
             <controls:SearchKeypad x:Name="Keypad"
                                    Grid.Row="0"
-                                   HorizontalAlignment="Center"
-                                   VerticalAlignment="Center"
-                                   Margin="10"/>
+                                   HorizontalAlignment="Stretch"
+                                   VerticalAlignment="Stretch"
+                                   Margin="0"/>
         </Grid>
     </Border>
 </Window>

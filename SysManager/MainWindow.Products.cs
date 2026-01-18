@@ -139,14 +139,15 @@ namespace SysManager
         {
             try
             {
-                Logs.Write($"LoadProducts: START încărcare produse (Gestiune={_selectedGestiuneId}, Grupa={_selectedGrupaId})");
+                // ✅ ASCUNDE OVERLAY-UL când încarcă produse normale
+                AscundeMesajNuExistaProduse();
 
                 _allProductButtons.Clear();
 
                 // ✅ ÎNCARCĂ PRODUSELE DIN BAZA DE DATE
                 var produse = _dbQuery.GetProduse(_selectedGestiuneId, _selectedGrupaId);
 
-                Logs.Write($"📦 PRODUSE GĂSITE: {produse.Count}");
+                //Logs.Write($"📦 PRODUSE GĂSITE: {produse.Count}");
 
                 // ✅ RECALCULEAZĂ LAYOUT ÎNAINTE de a crea butoanele
                 CalculateProductLayout();
@@ -183,10 +184,10 @@ namespace SysManager
                     : 1;
                 _currentProductPage = 0;
 
-                Logs.Write($"📊 PAGINARE PRODUSE:");
-                Logs.Write($"   → Total produse: {_allProductButtons.Count}");
-                Logs.Write($"   → Produse per pagină: {_productsPerPage}");
-                Logs.Write($"   → Total pagini: {_totalProductPages}");
+                //Logs.Write($"📊 PAGINARE PRODUSE:");
+                //Logs.Write($"   → Total produse: {_allProductButtons.Count}");
+                //Logs.Write($"   → Produse per pagină: {_productsPerPage}");
+                //Logs.Write($"   → Total pagini: {_totalProductPages}");
 
                 DisplayProductPage();
 
@@ -195,15 +196,14 @@ namespace SysManager
                 //string grupaName = _selectedGrupaId == 0 ? "toate grupele" : SelectedGroup.Text;
                 //StatusText.Text = $"Încărcate {produse.Count} produse ({grupaName})";
 
-                Logs.Write($"LoadProducts: SUCCESS");
+                //Logs.Write($"LoadProducts: SUCCESS");
             }
             catch (Exception ex)
             {
                 Logs.Write("EROARE la încărcarea produselor:");
                 Logs.Write(ex);
                 StatusText.Text = "EROARE la încărcarea produselor!";
-                MessageBox.Show($"Eroare la încărcarea produselor:\n{ex.Message}", "Eroare",
-                    MessageBoxButton.OK, MessageBoxImage.Error);
+                //MessageBox.Show($"Eroare la încărcarea produselor:\n{ex.Message}", "Eroare", MessageBoxButton.OK, MessageBoxImage.Error);
             }
         }
 
@@ -222,7 +222,7 @@ namespace SysManager
 
                 if (_allProductButtons.Count == 0)
                 {
-                    Logs.Write("DisplayProductPage: Niciun produs de afișat");
+                    //Logs.Write("DisplayProductPage: Niciun produs de afișat");
                     ProductPageInfo.Text = "0/0";
                     return;
                 }
@@ -240,7 +240,7 @@ namespace SysManager
 
                 UpdateProductNavigationButtons();
 
-                Logs.Write($"📄 PAGINA PRODUSE {_currentProductPage + 1}/{_totalProductPages}: Afișate {end - start} produse (index {start}-{end - 1})");
+                //Logs.Write($"📄 PAGINA PRODUSE {_currentProductPage + 1}/{_totalProductPages}: Afișate {end - start} produse (index {start}-{end - 1})");
             }
             catch (Exception ex)
             {
@@ -269,18 +269,20 @@ namespace SysManager
         /// </summary>
         private void Product_Click(object sender, RoutedEventArgs e)
         {
-            Logs.Write($"🔘 Product_Click: Event declanșat!");
+            //Logs.Write($"🔘 Product_Click: Event declanșat!");
+            // ✅ CURĂȚĂ INTERFAȚA DE CĂUTARE (închide tastatura + șterge text)
+            ClearSearchInterface();
 
             if (sender is POSButton btn && btn.Tag is Models.Produs produs)
             {
-                Logs.Write($"📦 Produs identificat: {produs.Denumire} (ID: {produs.Id}, PretBrut: {produs.PretBrut:F2} RON cu TVA)");
+                //Logs.Write($"📦 Produs identificat: {produs.Denumire} (ID: {produs.Id}, PretBrut: {produs.PretBrut:F2} RON cu TVA)");
 
                 try
                 {
                     // ✅ VERIFICĂ DACĂ BONMANAGER E INIȚIALIZAT
                     if (_bonManager == null)
                     {
-                        Logs.Write("⚠️ AVERTISMENT: BonManager nu este inițializat! Reinițializare...");
+                        //Logs.Write("⚠️ AVERTISMENT: BonManager nu este inițializat! Reinițializare...");
                         InitializeazaBonManager();
                     }
 
@@ -302,25 +304,25 @@ namespace SysManager
                             if (cantitateInput > 0)
                             {
                                 cantitate = cantitateInput;
-                                Logs.Write($"✅ Cantitate citită din TxtCantitateBon: {cantitate}");
+                                //Logs.Write($"✅ Cantitate citită din TxtCantitateBon: {cantitate}");
                             }
                             else
                             {
-                                Logs.Write($"⚠️ Cantitate invalidă ({cantitateInput}), folosim 1");
+                                //Logs.Write($"⚠️ Cantitate invalidă ({cantitateInput}), folosim 1");
                                 TxtCantitateBon.Text = "1";
                                 cantitate = 1;
                             }
                         }
                         else
                         {
-                            Logs.Write($"⚠️ Parse failed pentru '{TxtCantitateBon.Text}', folosim 1");
+                           // Logs.Write($"⚠️ Parse failed pentru '{TxtCantitateBon.Text}', folosim 1");
                             TxtCantitateBon.Text = "1";
                             cantitate = 1;
                         }
                     }
                     else
                     {
-                        Logs.Write("⚠️ TxtCantitateBon gol, folosim cantitate = 1");
+                        //Logs.Write("⚠️ TxtCantitateBon gol, folosim cantitate = 1");
                         cantitate = 1;
                     }
 
@@ -331,7 +333,7 @@ namespace SysManager
                     // ═══════════════════════════════════════════════════════════════
                     decimal pretBrutTotal = cantitate * produs.PretBrut;
 
-                    Logs.Write($"💵 Calcul preț cu TVA (BRUT): {cantitate} × {produs.PretBrut:F2} = {pretBrutTotal:F2} RON ✅");
+                    //Logs.Write($"💵 Calcul preț cu TVA (BRUT): {cantitate} × {produs.PretBrut:F2} = {pretBrutTotal:F2} RON ✅");
 
                     // ═══════════════════════════════════════════════════════════════
                     // ✅ ADAUGĂ PRODUSUL ÎN BON CU CANTITATEA SPECIFICATĂ
@@ -339,64 +341,61 @@ namespace SysManager
                     // ═══════════════════════════════════════════════════════════════
                     var bonItem = _bonManager.AdaugaProdus(produs, cantitate);
 
-                    Logs.Write($"✅ Produs adăugat în bon: {produs.Denumire} × {cantitate} = {bonItem.Total:F2} RON");
+                    //Logs.Write($"✅ Produs adăugat în bon: {produs.Denumire} × {cantitate} = {bonItem.Total:F2} RON");
 
                     // ═══════════════════════════════════════════════════════════════
                     // ✅ ACTUALIZEAZĂ TOTALUL ÎN UI
                     // ═══════════════════════════════════════════════════════════════
                     TotalText.Text = _bonManager.Total.ToString("F2");
-                    Logs.Write($"💰 Total bon actualizat: {_bonManager.Total:F2} RON");
+                    //Logs.Write($"💰 Total bon actualizat: {_bonManager.Total:F2} RON");
 
                     // ═══════════════════════════════════════════════════════════════
                     // ✅ RESETEAZĂ CANTITATEA LA 1 (OPȚIONAL - COMENTEAZĂ DACĂ NU VREI)
                     // ═══════════════════════════════════════════════════════════════
-                    TxtCantitateBon.Text = "1";
+                    TxtCantitateBon.Text = "1.000";
 
                     // ✅ Animație vizuală (opțional)
-                    try
-                    {
-                        AnimatieProdusAdaugat(btn);
-                    }
-                    catch (Exception animEx)
-                    {
-                        Logs.Write($"⚠️ Eroare animație (non-critical): {animEx.Message}");
-                    }
+                    //try
+                    //{
+                    //    AnimatieProdusAdaugat(btn);
+                    //}
+                    //catch (Exception animEx)
+                    //{
+                    //    Logs.Write($"⚠️ Eroare animație (non-critical): {animEx.Message}");
+                    //}
 
                     // ✅ Actualizează status bar
                     StatusText.Text = $"Adăugat: {produs.Denumire} × {cantitate} = {bonItem.Total:F2} RON";
+                    BonGrid.SelectedItem = bonItem;
+                    BonGrid.ScrollIntoView(bonItem);
+                    BonGrid.Focus();
                 }
                 catch (Exception ex)
                 {
                     Logs.Write($"❌ EROARE la adăugarea produsului:");
                     Logs.Write(ex);
 
-                    MessageBox.Show($"Eroare la adăugarea produsului!\n\n{ex.Message}",
-                                   "Eroare",
-                                   MessageBoxButton.OK,
-                                   MessageBoxImage.Error);
+                    //MessageBox.Show($"Eroare la adăugarea produsului!\n\n{ex.Message}", "Eroare", MessageBoxButton.OK, MessageBoxImage.Error);
 
                     StatusText.Text = "EROARE la adăugarea produsului!";
                 }
             }
             else
             {
-                Logs.Write($"⚠️ Product_Click: Butonul sau produsul nu a fost identificat corect!");
-                Logs.Write($"   Sender Type: {sender?.GetType().Name ?? "null"}");
+                //Logs.Write($"⚠️ Product_Click: Butonul sau produsul nu a fost identificat corect!");
+                //Logs.Write($"   Sender Type: {sender?.GetType().Name ?? "null"}");
 
-                if (sender is POSButton button)
-                {
-                    Logs.Write($"   Button.Tag Type: {button.Tag?.GetType().Name ?? "null"}");
-                    Logs.Write($"   Button.Tag Value: {button.Tag?.ToString() ?? "null"}");
-                }
-                else
-                {
-                    Logs.Write($"   Sender nu este POSButton!");
-                }
+                //if (sender is POSButton button)
+                //{
+                //    Logs.Write($"   Button.Tag Type: {button.Tag?.GetType().Name ?? "null"}");
+                //    Logs.Write($"   Button.Tag Value: {button.Tag?.ToString() ?? "null"}");
+                //}
+                //else
+                //{
+                //    Logs.Write($"   Sender nu este POSButton!");
+                //}
 
-                MessageBox.Show("Eroare: Produsul nu a fost identificat corect!\n\nVerifică Logs.txt pentru detalii.",
-                               "Eroare",
-                               MessageBoxButton.OK,
-                               MessageBoxImage.Warning);
+                //MessageBox.Show("Eroare: Produsul nu a fost identificat corect!\n\nVerifică Logs.txt pentru detalii.", "Eroare", MessageBoxButton.OK, MessageBoxImage.Warning);
 
                 StatusText.Text = "Eroare: Produs invalid!";
             }
@@ -524,7 +523,6 @@ namespace SysManager
         {
             try
             {
-                // ✅ Previne căutări multiple simultane
                 if (_isSearching)
                 {
                     Logs.Write("⚠️ Căutare deja în desfășurare, se ignoră...");
@@ -533,11 +531,12 @@ namespace SysManager
 
                 string searchText = TxtCautareArticolBon.Text?.Trim() ?? "";
 
-                // ✅ Dacă textul e gol, reîncarcă produsele normale
+                // ✅ Dacă textul e gol, ascunde overlay-ul și reîncarcă produsele
                 if (string.IsNullOrWhiteSpace(searchText))
                 {
-                    Logs.Write("🔍 Text căutare gol, reîncărcare produse normale...");
-                    LoadProducts();
+                    Logs.Write("🔍 Text căutare gol, ascundere overlay...");
+                    AscundeMesajNuExistaProduse(); // ✅ ASCUNDE OVERLAY
+                    LoadProducts(); // ✅ REÎNCARCĂ PRODUSE NORMALE
                     return;
                 }
 
@@ -550,7 +549,7 @@ namespace SysManager
 
                 _isSearching = true;
 
-                Logs.Write($"🔍 CĂUTARE PRODUSE: '{searchText}' (Grupa: {(_selectedGrupaId == 0 ? "Toate" : _selectedGrupaId.ToString())})");
+                Logs.Write($"🔍 CĂUTARE PRODUSE: '{searchText}'");
 
                 // ✅ APELEAZĂ PROCEDURA FIREBIRD
                 var produse = _dbQuery.SearchArticole(searchText, _selectedGrupaId);
@@ -558,12 +557,13 @@ namespace SysManager
                 // ✅ VERIFICĂ REZULTATELE
                 if (produse.Count == 0)
                 {
-                    // ❌ NU S-AU GĂSIT PRODUSE
+                    // ❌ NU S-AU GĂSIT PRODUSE - ARATĂ OVERLAY
                     AfiseazaMesajNuExistaProduse(searchText);
                 }
                 else
                 {
-                    // ✅ AFIȘEAZĂ PRODUSELE GĂSITE
+                    // ✅ PRODUSE GĂSITE - ASCUNDE OVERLAY ȘI AFIȘEAZĂ PRODUSE
+                    AscundeMesajNuExistaProduse();
                     AfiseazaProduseGasite(produse);
                 }
             }
@@ -572,7 +572,6 @@ namespace SysManager
                 Logs.Write("❌ EROARE la căutarea produselor:");
                 Logs.Write(ex);
                 StatusText.Text = "EROARE la căutarea produselor!";
-                MessageBox.Show($"Eroare la căutare:\n{ex.Message}", "Eroare", MessageBoxButton.OK, MessageBoxImage.Error);
             }
             finally
             {
@@ -585,24 +584,12 @@ namespace SysManager
         /// </summary>
         private void AfiseazaMesajNuExistaProduse(string searchText)
         {
-            ProductsPanel.Children.Clear();
+            // ✅ ASCUNDE PRODUSELE (dar nu le șterge și nu modifică layout-ul!)
+            ProductsPanel.Visibility = Visibility.Collapsed;
 
-            // ✅ Creează TextBlock cu mesaj roșu
-            var textBlock = new System.Windows.Controls.TextBlock
-            {
-                Text = $"❌ NU AM GĂSIT ARTICOLE\n\nCăutare: \"{searchText}\"",
-                Foreground = new SolidColorBrush(Colors.Red),
-                FontSize = 24,
-                FontWeight = FontWeights.Bold,
-                TextAlignment = System.Windows.TextAlignment.Center,
-                VerticalAlignment = VerticalAlignment.Center,
-                HorizontalAlignment = HorizontalAlignment.Center,
-                TextWrapping = TextWrapping.Wrap,
-                Margin = new Thickness(20)
-            };
-
-            // ✅ Adaugă TextBlock-ul în ProductsPanel
-            ProductsPanel.Children.Add(textBlock);
+            // ✅ AFIȘEAZĂ OVERLAY-UL CU MESAJ
+            NoProductsOverlay.Visibility = Visibility.Visible;
+            NoProductsSearch.Text = $"Căutare: \"{searchText}\"";
 
             // ✅ Actualizează UI
             ProductPageInfo.Text = "0/0";
@@ -610,7 +597,21 @@ namespace SysManager
             BtnNextProductPage.IsEnabled = false;
             StatusText.Text = $"Niciun produs găsit pentru '{searchText}'";
 
-            Logs.Write($"❌ Căutare fără rezultate: '{searchText}'");
+            Logs.Write($"❌ Căutare fără rezultate: '{searchText}' - Overlay afișat");
+        }
+
+        /// <summary>
+        /// Ascunde mesajul și arată din nou produsele
+        /// </summary>
+        private void AscundeMesajNuExistaProduse()
+        {
+            // ✅ ASCUNDE OVERLAY-UL
+            NoProductsOverlay.Visibility = Visibility.Collapsed;
+
+            // ✅ ARATĂ PRODUSELE
+            ProductsPanel.Visibility = Visibility.Visible;
+
+            Logs.Write("✅ Overlay ascuns, ProductsPanel vizibil");
         }
 
         /// <summary>

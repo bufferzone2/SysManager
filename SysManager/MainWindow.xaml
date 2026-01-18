@@ -1,4 +1,4 @@
-﻿<!-- MainWindow.xaml - NOUĂ CONFIGURAȚIE -->
+﻿<!-- MainWindow.xaml - NOUĂ CONFIGURAȚIE CU BUTOANE ÎN ROW 1 -->
 <Window x:Class="SysManager.MainWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
@@ -27,7 +27,7 @@
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="*"/>
             <!-- Coloana stânga: Grupe + Produse -->
-            <ColumnDefinition Width="380"/>
+            <ColumnDefinition Width="400"/>
             <!-- Coloana dreapta: Bon (full height) -->
         </Grid.ColumnDefinitions>
 
@@ -49,12 +49,12 @@
                 </Grid.ColumnDefinitions>
 
                 <!-- Butoane Gestiuni - Dinamice -->
-                <UniformGrid x:Name="GestiuniPanel"
-                             Grid.Column="0"
-                             Rows="1"
-                             HorizontalAlignment="Left"
-                             VerticalAlignment="Center"
-                             Margin="5,0" />
+                <StackPanel x:Name="GestiuniPanel"
+                    Grid.Column="0"
+                    Orientation="Horizontal"
+                    HorizontalAlignment="Left"
+                    VerticalAlignment="Center"
+                    Margin="5,0" />
 
                 <!-- Butoane Navigare Grupe -->
                 <StackPanel Grid.Column="1" 
@@ -74,7 +74,22 @@
                             Margin="2"
                             Click="PrevPage_Click"
                             ToolTip="Pagina anterioară grupe"
-                            IsEnabled="False"/>
+                            IsEnabled="False">
+                        <Button.Style>
+                            <Style TargetType="Button">
+                                <Setter Property="Background" Value="#2196F3"/>
+                                <Setter Property="BorderBrush" Value="#1976D2"/>
+                                <Style.Triggers>
+                                    <Trigger Property="IsEnabled" Value="False">
+                                        <Setter Property="Background" Value="#BDBDBD"/>
+                                        <Setter Property="BorderBrush" Value="#9E9E9E"/>
+                                        <Setter Property="Foreground" Value="#757575"/>
+                                        <Setter Property="Opacity" Value="0.65"/>
+                                    </Trigger>
+                                </Style.Triggers>
+                            </Style>
+                        </Button.Style>
+                    </Button>
 
                     <TextBlock x:Name="PageInfo"
                                Text="1/1"
@@ -97,7 +112,22 @@
                             Margin="2"
                             Click="NextPage_Click"
                             ToolTip="Pagina următoare grupe"
-                            IsEnabled="False"/>
+                            IsEnabled="False">
+                        <Button.Style>
+                            <Style TargetType="Button">
+                                <Setter Property="Background" Value="#2196F3"/>
+                                <Setter Property="BorderBrush" Value="#1976D2"/>
+                                <Style.Triggers>
+                                    <Trigger Property="IsEnabled" Value="False">
+                                        <Setter Property="Background" Value="#BDBDBD"/>
+                                        <Setter Property="BorderBrush" Value="#9E9E9E"/>
+                                        <Setter Property="Foreground" Value="#757575"/>
+                                        <Setter Property="Opacity" Value="0.65"/>
+                                    </Trigger>
+                                </Style.Triggers>
+                            </Style>
+                        </Button.Style>
+                    </Button>
                 </StackPanel>
             </Grid>
         </Border>
@@ -176,9 +206,7 @@
             <Grid VerticalAlignment="Center">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="70"/>
-                    <!-- Cantitate -->
                     <ColumnDefinition Width="*"/>
-                    <!-- Căutare -->
                 </Grid.ColumnDefinitions>
 
                 <!-- TextBox Cantitate -->
@@ -249,13 +277,11 @@
         <!-- ✅ Stânga: Zona Produse + Navigare -->
         <Border Grid.Row="2" Grid.Column="0" 
                 Background="#A0C4E1" 
-                Padding="5">
+                Padding="1">
             <Grid>
                 <Grid.RowDefinitions>
                     <RowDefinition Height="*"/>
-                    <!-- Produse -->
                     <RowDefinition Height="Auto"/>
-                    <!-- Navigare -->
                 </Grid.RowDefinitions>
 
                 <!-- Panou Produse -->
@@ -266,11 +292,45 @@
                              Background="Transparent"
                              ClipToBounds="False" />
 
+                <!-- ✅ OVERLAY PENTRU MESAJ (DEASUPRA ProductsPanel) -->
+                <Border x:Name="NoProductsOverlay"
+                Grid.Row="0"
+                Background="#FFF5F5"
+                BorderBrush="#E53935"
+                BorderThickness="3"
+                CornerRadius="8"
+                Margin="20"
+                MaxWidth="400"
+                MaxHeight="250"
+                HorizontalAlignment="Center"
+                VerticalAlignment="Center"
+                Visibility="Collapsed">
+                    <StackPanel VerticalAlignment="Center" 
+                        HorizontalAlignment="Center">
+                        <TextBlock Text="❌"
+                           FontSize="80"
+                           HorizontalAlignment="Center"
+                           Margin="0,0,0,20"/>
+                        <TextBlock x:Name="NoProductsTitle"
+                           Text="NU AM GĂSIT ARTICOLE"
+                           FontSize="32"
+                           FontWeight="Bold"
+                           Foreground="#E53935"
+                           HorizontalAlignment="Center"
+                           Margin="0,0,0,10"/>
+                        <TextBlock x:Name="NoProductsSearch"
+                           Text="Căutare: &quot;...&quot;"
+                           FontSize="18"
+                           Foreground="Gray"
+                           HorizontalAlignment="Center"
+                           Margin="0,0,0,30"/>
+                    </StackPanel>
+                </Border>
                 <!-- Butoane Navigare Produse -->
                 <Border Grid.Row="1" 
                         Background="#5B9BD5" 
                         Padding="5" 
-                        Margin="0,5,0,0">
+                        Margin="5,4,0,5">
                     <Grid>
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition Width="*"/>
@@ -294,16 +354,29 @@
                                     Content="◀"
                                     Width="65"
                                     Height="55"
-                                    Background="#2196F3"
                                     Foreground="White"
                                     FontSize="18"
                                     FontWeight="Bold"
                                     BorderThickness="1"
-                                    BorderBrush="#1976D2"
                                     Margin="1,0"
                                     Click="PrevProductPage_Click"
                                     ToolTip="Pagina anterioară produse"
-                                    IsEnabled="False"/>
+                                    IsEnabled="False">
+                                <Button.Style>
+                                    <Style TargetType="Button">
+                                        <Setter Property="Background" Value="#2196F3"/>
+                                        <Setter Property="BorderBrush" Value="#1976D2"/>
+                                        <Style.Triggers>
+                                            <Trigger Property="IsEnabled" Value="False">
+                                                <Setter Property="Background" Value="#BDBDBD"/>
+                                                <Setter Property="BorderBrush" Value="#9E9E9E"/>
+                                                <Setter Property="Foreground" Value="#757575"/>
+                                                <Setter Property="Opacity" Value="0.65"/>
+                                            </Trigger>
+                                        </Style.Triggers>
+                                    </Style>
+                                </Button.Style>
+                            </Button>
 
                             <Button x:Name="BtnNextProductPage"
                                     Content="▶"
@@ -318,7 +391,22 @@
                                     Margin="1,0"
                                     Click="NextProductPage_Click"
                                     ToolTip="Pagina următoare produse"
-                                    IsEnabled="False"/>
+                                    IsEnabled="False">
+                                <Button.Style>
+                                    <Style TargetType="Button">
+                                        <Setter Property="Background" Value="#2196F3"/>
+                                        <Setter Property="BorderBrush" Value="#1976D2"/>
+                                        <Style.Triggers>
+                                            <Trigger Property="IsEnabled" Value="False">
+                                                <Setter Property="Background" Value="#BDBDBD"/>
+                                                <Setter Property="BorderBrush" Value="#9E9E9E"/>
+                                                <Setter Property="Foreground" Value="#757575"/>
+                                                <Setter Property="Opacity" Value="0.65"/>
+                                            </Trigger>
+                                        </Style.Triggers>
+                                    </Style>
+                                </Button.Style>
+                            </Button>
                         </StackPanel>
                     </Grid>
                 </Border>
@@ -327,16 +415,16 @@
 
         <!-- ✅ Dreapta: Panou BON (FULL HEIGHT - Rows 1+2) -->
         <Border Grid.Row="1" Grid.RowSpan="2" Grid.Column="1" 
-        Background="#F0F0F0" 
-        Margin="5,0,5,5" 
-        BorderBrush="#999999" 
-        BorderThickness="1">
+                Background="#F0F0F0" 
+                Margin="5,0,5,5" 
+                BorderBrush="#999999" 
+                BorderThickness="1">
             <Grid>
                 <Grid.RowDefinitions>
                     <RowDefinition Height="Auto"/>
                     <!-- Row 0: TextBox-uri Cantitate + Căutare BON -->
                     <RowDefinition Height="*"/>
-                    <!-- Row 1: DataGrid BON -->
+                    <!-- Row 1: DataGrid BON + Butoane -->
                     <RowDefinition Height="Auto"/>
                     <!-- Row 2: Total -->
                     <RowDefinition Height="Auto"/>
@@ -347,249 +435,671 @@
                 <!-- ROW 0: TEXTBOX-URI CANTITATE + CĂUTARE (DEASUPRA BON) -->
                 <!-- ═══════════════════════════════════════════════════════════ -->
                 <Border Grid.Row="0" 
-                Background="#7BADD9" 
-                BorderBrush="#5B9BD5" 
-                BorderThickness="0,0,0,1"
-                Padding="5">
+                        Background="#7BADD9" 
+                        BorderBrush="#5B9BD5" 
+                        BorderThickness="0,0,0,1"
+                        Padding="5">
                     <Grid>
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition Width="70"/>
-                            <!-- Cantitate -->
                             <ColumnDefinition Width="*"/>
-                            <!-- Căutare -->
                         </Grid.ColumnDefinitions>
 
                         <!-- TextBox Cantitate BON - Click pentru Tastatură Numerică -->
-                        <!-- TextBox Cantitate BON - Click pentru Tastatură Numerică -->
                         <Border Grid.Column="0" 
-        Background="White" 
-        BorderBrush="#0066CC" 
-        BorderThickness="2" 
-        CornerRadius="2"
-        Margin="0,0,4,0"
-        Cursor="Hand"
-        MouseDown="TxtCantitateBon_MouseDown"
-        ToolTip="Click pentru a introduce cantitatea">
+                                Background="White" 
+                                BorderBrush="#0066CC" 
+                                BorderThickness="2" 
+                                CornerRadius="2"
+                                Margin="0,0,4,0"
+                                Cursor="Hand"
+                                MouseDown="TxtCantitateBon_MouseDown"
+                                ToolTip="Click pentru a introduce cantitatea">
                             <TextBox x:Name="TxtCantitateBon"
-             Text="1.000"
-             FontSize="16"
-             FontWeight="Bold"
-             Foreground="#0066CC"
-             TextAlignment="Center"
-             VerticalContentAlignment="Center"
-             BorderThickness="0"
-             Background="Transparent"
-             Height="32"
-             IsReadOnly="True"
-             Cursor="Hand"
-             Focusable="False"/>
+                                     Text="1.000"
+                                     FontSize="16"
+                                     FontWeight="Bold"
+                                     Foreground="#0066CC"
+                                     TextAlignment="Center"
+                                     VerticalContentAlignment="Center"
+                                     BorderThickness="0"
+                                     Background="Transparent"
+                                     Height="32"
+                                     IsReadOnly="True"
+                                     Cursor="Hand"
+                                     Focusable="False"/>
                         </Border>
 
-                        <!-- ✅ TEXTBOX CĂUTARE ARTICOL BON -->
-                        <Border Grid.Column="1" 
-                        Background="White" 
-                        BorderBrush="#0066CC" 
-                        BorderThickness="2" 
-                        CornerRadius="2">
-                            <TextBox x:Name="TxtCautareArticolBon"
-                             FontSize="14"
-                             Foreground="#333333"
-                             VerticalContentAlignment="Center"
-                             BorderThickness="0"
-                             Background="Transparent"
-                             Height="32"
-                             Padding="8,0"
-                             TextChanged="TxtCautareArticolBon_TextChanged" ToolTip="Caută articol după denumire sau cod" Text="Caută articol după denumire sau cod">
-                                <TextBox.Style>
-                                    <Style TargetType="{x:Type TextBox}">
-                                        <Style.Triggers>
-                                            <Trigger Property="Text" Value="">
-                                                <Setter Property="Background">
-                                                    <Setter.Value>
-                                                        <VisualBrush Stretch="None" AlignmentX="Left">
-                                                            <VisualBrush.Visual>
-                                                                <TextBlock Text="🔍 Caută în BON..."
-                                                                   Foreground="#999999"
-                                                                   FontSize="14"
-                                                                   Margin="8,0,0,0"
-                                                                   VerticalAlignment="Center"/>
-                                                            </VisualBrush.Visual>
-                                                        </VisualBrush>
-                                                    </Setter.Value>
-                                                </Setter>
-                                            </Trigger>
-                                        </Style.Triggers>
+                        <!-- ✅ TEXTBOX CĂUTARE ARTICOL BON CU BUTON TASTATURĂ -->
+                        <Grid Grid.Column="1">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="40"/>
+                            </Grid.ColumnDefinitions>
+
+                            <!-- TextBox Căutare -->
+                            <Border Grid.Column="0"
+                                    Background="White" 
+                                    BorderBrush="#0066CC" 
+                                    BorderThickness="2,2,0,2"
+                                    CornerRadius="2,0,0,2">
+                                <TextBox x:Name="TxtCautareArticolBon"
+                                         FontSize="14"
+                                         Foreground="#333333"
+                                         VerticalContentAlignment="Center"
+                                         BorderThickness="0"
+                                         Background="Transparent"
+                                         Height="32"
+                                         Padding="8,0"
+                                         TextChanged="TxtCautareArticolBon_TextChanged"
+                                         ToolTip="Caută articol după denumire sau cod">
+                                    <TextBox.Style>
+                                        <Style TargetType="{x:Type TextBox}">
+                                            <Style.Triggers>
+                                                <Trigger Property="Text" Value="">
+                                                    <Setter Property="Background">
+                                                        <Setter.Value>
+                                                            <VisualBrush Stretch="None" AlignmentX="Left">
+                                                                <VisualBrush.Visual>
+                                                                    <TextBlock Text="🔍 Caută în BON..."
+                                                                               Foreground="#999999"
+                                                                               FontSize="14"
+                                                                               Margin="8,0,0,0"
+                                                                               VerticalAlignment="Center"/>
+                                                                </VisualBrush.Visual>
+                                                            </VisualBrush>
+                                                        </Setter.Value>
+                                                    </Setter>
+                                                </Trigger>
+                                            </Style.Triggers>
+                                        </Style>
+                                    </TextBox.Style>
+                                </TextBox>
+                            </Border>
+
+                            <!-- Buton Tastatură -->
+                            <Button Grid.Column="1"
+                                    Background="#0066CC"
+                                    BorderBrush="#0066CC"
+                                    BorderThickness="2"
+                                    VerticalAlignment="Stretch"
+                                    HorizontalAlignment="Stretch"
+                                    Cursor="Hand"
+                                    ToolTip="Deschide tastatura"
+                                    Click="BtnKeyboard_Click">
+                                <Button.Style>
+                                    <Style TargetType="Button">
+                                        <Setter Property="Template">
+                                            <Setter.Value>
+                                                <ControlTemplate TargetType="Button">
+                                                    <Border x:Name="border"
+                                                            Background="{TemplateBinding Background}"
+                                                            BorderBrush="{TemplateBinding BorderBrush}"
+                                                            BorderThickness="{TemplateBinding BorderThickness}"
+                                                            CornerRadius="0,2,2,0">
+                                                        <Viewbox Width="20" Height="20">
+                                                            <Canvas Width="24" Height="24">
+                                                                <Rectangle Canvas.Left="2" Canvas.Top="6" 
+                                                                           Width="20" Height="14" 
+                                                                           Fill="White" 
+                                                                           Stroke="White" 
+                                                                           StrokeThickness="1"
+                                                                           RadiusX="1" RadiusY="1"/>
+                                                                <Rectangle Canvas.Left="3" Canvas.Top="8" Width="2" Height="2" Fill="#0066CC"/>
+                                                                <Rectangle Canvas.Left="6" Canvas.Top="8" Width="2" Height="2" Fill="#0066CC"/>
+                                                                <Rectangle Canvas.Left="9" Canvas.Top="8" Width="2" Height="2" Fill="#0066CC"/>
+                                                                <Rectangle Canvas.Left="12" Canvas.Top="8" Width="2" Height="2" Fill="#0066CC"/>
+                                                                <Rectangle Canvas.Left="15" Canvas.Top="8" Width="2" Height="2" Fill="#0066CC"/>
+                                                                <Rectangle Canvas.Left="18" Canvas.Top="8" Width="2" Height="2" Fill="#0066CC"/>
+                                                                <Rectangle Canvas.Left="3" Canvas.Top="11" Width="2" Height="2" Fill="#0066CC"/>
+                                                                <Rectangle Canvas.Left="6" Canvas.Top="11" Width="2" Height="2" Fill="#0066CC"/>
+                                                                <Rectangle Canvas.Left="9" Canvas.Top="11" Width="2" Height="2" Fill="#0066CC"/>
+                                                                <Rectangle Canvas.Left="12" Canvas.Top="11" Width="2" Height="2" Fill="#0066CC"/>
+                                                                <Rectangle Canvas.Left="15" Canvas.Top="11" Width="2" Height="2" Fill="#0066CC"/>
+                                                                <Rectangle Canvas.Left="18" Canvas.Top="11" Width="2" Height="2" Fill="#0066CC"/>
+                                                                <Rectangle Canvas.Left="6" Canvas.Top="14" Width="12" Height="2" Fill="#0066CC"/>
+                                                            </Canvas>
+                                                        </Viewbox>
+                                                    </Border>
+                                                    <ControlTemplate.Triggers>
+                                                        <Trigger Property="IsMouseOver" Value="True">
+                                                            <Setter TargetName="border" Property="Background" Value="#0052A3"/>
+                                                        </Trigger>
+                                                        <Trigger Property="IsPressed" Value="True">
+                                                            <Setter TargetName="border" Property="Background" Value="#003D82"/>
+                                                        </Trigger>
+                                                    </ControlTemplate.Triggers>
+                                                </ControlTemplate>
+                                            </Setter.Value>
+                                        </Setter>
                                     </Style>
-                                </TextBox.Style>
-                            </TextBox>
-                        </Border>
+                                </Button.Style>
+                            </Button>
+                        </Grid>
                     </Grid>
                 </Border>
 
                 <!-- ═══════════════════════════════════════════════════════════════ -->
-                <!-- ROW 1: DATAGRID BON -->
+                <!-- ROW 1: DATAGRID BON + BUTOANE (2 COLOANE) -->
                 <!-- ═══════════════════════════════════════════════════════════════ -->
-                <DataGrid x:Name="BonGrid"
-                  Grid.Row="1"
-                  AutoGenerateColumns="False"
-                  Background="White"
-                  Foreground="Black"
-                  HeadersVisibility="Column"
-                  RowHeight="35"
-                  FontSize="13"
-                  GridLinesVisibility="Horizontal"
-                  BorderThickness="0"
-                  Margin="5"
-                  CanUserAddRows="False"
-                  CanUserDeleteRows="False"
-                  IsReadOnly="True"
-                  SelectionMode="Single"
-                  SelectionUnit="FullRow">
-                    <DataGrid.Columns>
-                        <!-- ✅ Coloana Produs - fără formatare -->
-                        <DataGridTextColumn Header="Produs" 
-                            Binding="{Binding Nume}" 
-                            Width="*" 
-                            IsReadOnly="True"/>
+                <Grid Grid.Row="1">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                        <!-- BonGrid -->
+                        <ColumnDefinition Width="80"/>
+                        <!-- Butoane verticale -->
+                    </Grid.ColumnDefinitions>
 
-                        <!-- ✅ Coloana Cantitate - 3 ZECIMALE (ex: 1.000) -->
-                        <DataGridTextColumn Header="Cant" 
-                            Binding="{Binding Cantitate, StringFormat={}{0:F3}}" 
-                            Width="60" 
-                            IsReadOnly="True">
-                            <DataGridTextColumn.ElementStyle>
-                                <Style TargetType="TextBlock">
-                                    <Setter Property="HorizontalAlignment" Value="Right"/>
-                                    <Setter Property="Foreground" Value="#666666"/>
-                                    <!-- Culoare gri -->
-                                </Style>
-                            </DataGridTextColumn.ElementStyle>
-                        </DataGridTextColumn>
+                    <!-- COLOANA 0: DATAGRID BON -->
+                    <ScrollViewer x:Name="BonScrollViewer"
+                                  Grid.Column="0"
+                                  VerticalScrollBarVisibility="Hidden"
+                                  HorizontalScrollBarVisibility="Disabled"
+                                  Margin="5">
+                        <DataGrid x:Name="BonGrid"
+                                  AutoGenerateColumns="False"
+                                  Background="White"
+                                  Foreground="Black"
+                                  HeadersVisibility="Column"
+                                  RowHeight="35"
+                                  FontSize="13"
+                                  GridLinesVisibility="Horizontal"
+                                  BorderThickness="0"
+                                  CanUserAddRows="False"
+                                  CanUserDeleteRows="False"
+                                  IsReadOnly="True"
+                                  SelectionMode="Single"
+                                  SelectionUnit="FullRow">
+                            <!-- ✅ STYLING PENTRU SELECȚIE PERSISTENTĂ (CU SAU FĂRĂ FOCUS) -->
+                            <DataGrid.Resources>
+                                <!-- Stil pentru DataGridRow -->
+                                <Style TargetType="DataGridRow">
+                                    <Setter Property="Background" Value="White"/>
+                                    <Setter Property="Foreground" Value="Black"/>
 
-                        <!-- ✅ Coloana Total - 2 ZECIMALE (ex: 45.00) -->
-                        <DataGridTextColumn Header="Total" 
-                            Binding="{Binding Total, StringFormat={}{0:F2}}" 
-                            Width="80" 
-                            IsReadOnly="True">
-                            <DataGridTextColumn.ElementStyle>
-                                <Style TargetType="TextBlock">
-                                    <Setter Property="HorizontalAlignment" Value="Right"/>
-                                    <Setter Property="Foreground" Value="#666666"/>
-                                    <!-- Culoare gri -->
-                                    <Setter Property="FontWeight" Value="Bold"/>
+                                    <Style.Triggers>
+                                        <!-- ✅ SELECȚIE CU FOCUS (DataGrid activ) -->
+                                        <MultiTrigger>
+                                            <MultiTrigger.Conditions>
+                                                <Condition Property="IsSelected" Value="True"/>
+                                                <Condition Property="Selector.IsSelectionActive" Value="True"/>
+                                            </MultiTrigger.Conditions>
+                                            <Setter Property="Background" Value="#2196F3"/>
+                                            <!-- Albastru intens -->
+                                            <Setter Property="Foreground" Value="White"/>
+                                            <Setter Property="FontWeight" Value="Bold"/>
+                                        </MultiTrigger>
+
+                                        <!-- ✅ SELECȚIE FĂRĂ FOCUS (DataGrid inactiv) -->
+                                        <!-- ACEASTA ESTE LINIA CRITICĂ! -->
+                                        <MultiTrigger>
+                                            <MultiTrigger.Conditions>
+                                                <Condition Property="IsSelected" Value="True"/>
+                                                <Condition Property="Selector.IsSelectionActive" Value="False"/>
+                                            </MultiTrigger.Conditions>
+                                            <!-- ✅ FOLOSEȘTE ACEEAȘI CULOARE CA ȘI CU FOCUS! -->
+                                            <Setter Property="Background" Value="#2196F3"/>
+                                            <!-- SAU poți folosi o culoare puțin mai deschisă: #42A5F5 -->
+                                            <Setter Property="Foreground" Value="White"/>
+                                            <Setter Property="FontWeight" Value="Bold"/>
+                                        </MultiTrigger>
+                                    </Style.Triggers>
                                 </Style>
-                            </DataGridTextColumn.ElementStyle>
-                        </DataGridTextColumn>
-                    </DataGrid.Columns>
-                </DataGrid>
+
+                                <!-- Stil pentru DataGridCell -->
+                                <Style TargetType="DataGridCell">
+                                    <Setter Property="BorderThickness" Value="0"/>
+                                    <Setter Property="FocusVisualStyle" Value="{x:Null}"/>
+
+                                    <Style.Triggers>
+                                        <!-- Celulă selectată CU focus -->
+                                        <MultiTrigger>
+                                            <MultiTrigger.Conditions>
+                                                <Condition Property="IsSelected" Value="True"/>
+                                                <Condition Property="Selector.IsSelectionActive" Value="True"/>
+                                            </MultiTrigger.Conditions>
+                                            <Setter Property="Background" Value="Transparent"/>
+                                            <Setter Property="Foreground" Value="White"/>
+                                            <Setter Property="BorderBrush" Value="Transparent"/>
+                                        </MultiTrigger>
+
+                                        <!-- ✅ Celulă selectată FĂRĂ focus -->
+                                        <MultiTrigger>
+                                            <MultiTrigger.Conditions>
+                                                <Condition Property="IsSelected" Value="True"/>
+                                                <Condition Property="Selector.IsSelectionActive" Value="False"/>
+                                            </MultiTrigger.Conditions>
+                                            <Setter Property="Background" Value="Transparent"/>
+                                            <Setter Property="Foreground" Value="White"/>
+                                            <Setter Property="BorderBrush" Value="Transparent"/>
+                                        </MultiTrigger>
+                                    </Style.Triggers>
+                                </Style>
+                            </DataGrid.Resources>
+                            <DataGrid.Columns>
+                                <!-- ✅ Coloana Produs - CU TEXT WRAPPING PE 2 RÂNDURI -->
+                                <DataGridTextColumn Header="Produs" 
+                                                    Binding="{Binding Nume}" 
+                                                    Width="*" 
+                                                    IsReadOnly="True">
+                                    <DataGridTextColumn.ElementStyle>
+                                        <Style TargetType="TextBlock">
+                                            <Setter Property="TextWrapping" Value="Wrap"/>
+                                            <Setter Property="VerticalAlignment" Value="Center"/>
+                                            <Setter Property="Padding" Value="2"/>
+                                        </Style>
+                                    </DataGridTextColumn.ElementStyle>
+                                </DataGridTextColumn>
+
+                                <!-- ✅ Coloana Cantitate - 3 ZECIMALE (ex: 1.000) -->
+                                <DataGridTextColumn Header="Cant" 
+                                                    Binding="{Binding Cantitate, StringFormat={}{0:F3}}" 
+                                                    Width="50" 
+                                                    IsReadOnly="True">
+                                    <DataGridTextColumn.ElementStyle>
+                                        <Style TargetType="TextBlock">
+                                            <Setter Property="HorizontalAlignment" Value="Right"/>
+                                            <Setter Property="VerticalAlignment" Value="Center"/>
+                                        </Style>
+                                    </DataGridTextColumn.ElementStyle>
+                                </DataGridTextColumn>
+
+                                <!-- ✅ Coloana Total - 2 ZECIMALE (ex: 45.00) -->
+                                <DataGridTextColumn Header="Total" 
+                                                    Binding="{Binding Total, StringFormat={}{0:F2}}" 
+                                                    Width="60" 
+                                                    IsReadOnly="True">
+                                    <DataGridTextColumn.ElementStyle>
+                                        <Style TargetType="TextBlock">
+                                            <Setter Property="HorizontalAlignment" Value="Right"/>
+                                            <Setter Property="VerticalAlignment" Value="Center"/>
+                                        </Style>
+                                    </DataGridTextColumn.ElementStyle>
+                                </DataGridTextColumn>
+                            </DataGrid.Columns>
+                        </DataGrid>
+                    </ScrollViewer>
+
+                    <!-- COLOANA 1: BUTOANE VERTICALE -->
+                    <Border Grid.Column="1" 
+                            Background="#D0D0D0" 
+                            BorderBrush="#999999" 
+                            BorderThickness="1,0,0,0"
+                            Margin="0,5,5,5">
+                        <ScrollViewer VerticalScrollBarVisibility="Disabled" 
+                                      HorizontalScrollBarVisibility="Disabled">
+                            <StackPanel Orientation="Vertical" 
+                                        VerticalAlignment="Top"
+                                        Margin="5">
+
+                                <!-- Buton Scroll SUS -->
+                                <Button x:Name="BtnScrollUp"
+                                    Content="▲"
+                                    Background="#0066CC"
+                                    Foreground="White"
+                                    FontSize="24"
+                                    FontWeight="Bold"
+                                    Height="55"
+                                    Margin="0,0,0,5"
+                                    Click="BtnScrollUp_Click"
+                                    ToolTip="Derulare sus">
+                                    <Button.Style>
+                                        <Style TargetType="Button">
+                                            <Setter Property="Template">
+                                                <Setter.Value>
+                                                    <ControlTemplate TargetType="Button">
+                                                        <Border x:Name="border"
+                                                            Background="{TemplateBinding Background}"
+                                                            BorderBrush="#004C99"
+                                                            BorderThickness="2"
+                                                            CornerRadius="4">
+                                                            <ContentPresenter HorizontalAlignment="Center" 
+                                                                          VerticalAlignment="Center"/>
+                                                        </Border>
+                                                        <ControlTemplate.Triggers>
+                                                            <Trigger Property="IsMouseOver" Value="True">
+                                                                <Setter TargetName="border" Property="Background" Value="#0052A3"/>
+                                                            </Trigger>
+                                                            <Trigger Property="IsPressed" Value="True">
+                                                                <Setter TargetName="border" Property="Background" Value="#003D82"/>
+                                                            </Trigger>
+                                                        </ControlTemplate.Triggers>
+                                                    </ControlTemplate>
+                                                </Setter.Value>
+                                            </Setter>
+                                        </Style>
+                                    </Button.Style>
+                                </Button>
+
+                                <!-- Buton Scroll JOS -->
+                                <Button x:Name="BtnScrollDown"
+                                    Content="▼"
+                                    Background="#0066CC"
+                                    Foreground="White"
+                                    FontSize="24"
+                                    FontWeight="Bold"
+                                    Height="55"
+                                    Margin="0,0,0,5"
+                                    Click="BtnScrollDown_Click"
+                                    ToolTip="Derulare jos">
+                                    <Button.Style>
+                                        <Style TargetType="Button">
+                                            <Setter Property="Template">
+                                                <Setter.Value>
+                                                    <ControlTemplate TargetType="Button">
+                                                        <Border x:Name="border"
+                                                            Background="{TemplateBinding Background}"
+                                                            BorderBrush="#004C99"
+                                                            BorderThickness="2"
+                                                            CornerRadius="4">
+                                                            <ContentPresenter HorizontalAlignment="Center" 
+                                                                          VerticalAlignment="Center"/>
+                                                        </Border>
+                                                        <ControlTemplate.Triggers>
+                                                            <Trigger Property="IsMouseOver" Value="True">
+                                                                <Setter TargetName="border" Property="Background" Value="#0052A3"/>
+                                                            </Trigger>
+                                                            <Trigger Property="IsPressed" Value="True">
+                                                                <Setter TargetName="border" Property="Background" Value="#003D82"/>
+                                                            </Trigger>
+                                                        </ControlTemplate.Triggers>
+                                                    </ControlTemplate>
+                                                </Setter.Value>
+                                            </Setter>
+                                        </Style>
+                                    </Button.Style>
+                                </Button>
+
+                                <!-- Buton 3: Adauga cantitate -->
+                                <Button x:Name="BtnAddCant"
+                                        Content="+"
+                                        Background="#4CAF50"
+                                        Foreground="White"
+                                        FontSize="24"
+                                        FontWeight="Bold"
+                                        Height="55"
+                                        Margin="0,0,0,5"
+                                        Click="BtnAddCant_Click"
+                                        ToolTip="Adauga cantitate">
+                                    <Button.Style>
+                                        <Style TargetType="Button">
+                                            <Setter Property="Template">
+                                                <Setter.Value>
+                                                    <ControlTemplate TargetType="Button">
+                                                        <Border x:Name="border"
+                                                            Background="{TemplateBinding Background}"
+                                                            BorderBrush="#004C99"
+                                                            BorderThickness="2"
+                                                            CornerRadius="4">
+                                                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                                        </Border>
+                                                        <ControlTemplate.Triggers>
+                                                            <Trigger Property="IsMouseOver" Value="True">
+                                                                <Setter TargetName="border" Property="Background" Value="#0052A3"/>
+                                                            </Trigger>
+                                                            <Trigger Property="IsPressed" Value="True">
+                                                                <Setter TargetName="border" Property="Background" Value="#003D82"/>
+                                                            </Trigger>
+                                                        </ControlTemplate.Triggers>
+                                                    </ControlTemplate>
+                                                </Setter.Value>
+                                            </Setter>
+                                        </Style>
+                                    </Button.Style>
+                                </Button>
+
+                                <!-- Buton 4: Sterge cantitate -->
+                                <Button x:Name="BtnDelCant"
+                                        Content="-"
+                                        Background="#9C27B0"
+                                        Foreground="White"
+                                        FontSize="24"
+                                        FontWeight="Bold"
+                                        Height="55"
+                                        Margin="0,0,0,5"
+                                        Click="BtnDelCant_Click"
+                                        ToolTip="Sterge cantitate">
+                                    <Button.Style>
+                                        <Style TargetType="Button">
+                                            <Setter Property="Template">
+                                                <Setter.Value>
+                                                    <ControlTemplate TargetType="Button">
+                                                        <Border x:Name="border"
+                                                            Background="{TemplateBinding Background}"
+                                                            BorderBrush="#004C99"
+                                                            BorderThickness="2"
+                                                            CornerRadius="4">
+                                                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                                        </Border>
+                                                        <ControlTemplate.Triggers>
+                                                            <Trigger Property="IsMouseOver" Value="True">
+                                                                <Setter TargetName="border" Property="Background" Value="#0052A3"/>
+                                                            </Trigger>
+                                                            <Trigger Property="IsPressed" Value="True">
+                                                                <Setter TargetName="border" Property="Background" Value="#003D82"/>
+                                                            </Trigger>
+                                                        </ControlTemplate.Triggers>
+                                                    </ControlTemplate>
+                                                </Setter.Value>
+                                            </Setter>
+                                        </Style>
+                                    </Button.Style>
+                                </Button>
+
+                                <!-- Buton 5: Discount -->
+                                <Button x:Name="BtnDiscount"
+                                        Content="%"
+                                        Background="#607D8B"
+                                        Foreground="White"
+                                        FontSize="24"
+                                        FontWeight="Bold"
+                                        Height="55"
+                                        Margin="0,0,0,5"
+                                        ToolTip="Discount">
+                                    <Button.Style>
+                                        <Style TargetType="Button">
+                                            <Setter Property="Template">
+                                                <Setter.Value>
+                                                    <ControlTemplate TargetType="Button">
+                                                        <Border x:Name="border"
+                                                            Background="{TemplateBinding Background}"
+                                                            BorderBrush="#004C99"
+                                                            BorderThickness="2"
+                                                            CornerRadius="4">
+                                                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                                        </Border>
+                                                        <ControlTemplate.Triggers>
+                                                            <Trigger Property="IsMouseOver" Value="True">
+                                                                <Setter TargetName="border" Property="Background" Value="#0052A3"/>
+                                                            </Trigger>
+                                                            <Trigger Property="IsPressed" Value="True">
+                                                                <Setter TargetName="border" Property="Background" Value="#003D82"/>
+                                                            </Trigger>
+                                                        </ControlTemplate.Triggers>
+                                                    </ControlTemplate>
+                                                </Setter.Value>
+                                            </Setter>
+                                        </Style>
+                                    </Button.Style>
+                                </Button>
+                                <!-- Buton 6: Config -->
+                                <controls:BtnUniversal x:Name="BtnTest"
+                                    BtnName=""
+                                    BtnColor="#43A047"
+                                    Height="55"
+                                    Margin="0,0,0,5"               
+                                    BtnFontSize="12"
+                                    BtnImageStretch="Uniform"
+                                    BtnImagePath="/Resources/settings.png"
+                                    BtnImageOpacity="1"/>
+                            </StackPanel>
+                        </ScrollViewer>
+                    </Border>
+                </Grid>
 
                 <!-- ═══════════════════════════════════════════════════════════ -->
                 <!-- ROW 2: TOTAL -->
                 <!-- ═══════════════════════════════════════════════════════════ -->
                 <Border Grid.Row="2" 
-                Background="#0066CC" 
-                Padding="15,10" 
-                Margin="5">
+                        Background="#0066CC" 
+                        Padding="15,10" 
+                        Margin="5">
                     <Grid>
                         <TextBlock Text="TOTAL"
-                           Foreground="White"
-                           FontSize="18"
-                           FontWeight="Bold"
-                           VerticalAlignment="Center"
-                           HorizontalAlignment="Left"/>
+                                   Foreground="White"
+                                   FontSize="18"
+                                   FontWeight="Bold"
+                                   VerticalAlignment="Center"
+                                   HorizontalAlignment="Left"/>
                         <TextBlock x:Name="TotalText"
-                           Text="0.00"
-                           Foreground="White"
-                           FontSize="28"
-                           FontWeight="Bold"
-                           VerticalAlignment="Center"
-                           HorizontalAlignment="Right"/>
+                                   Text="0.00"
+                                   Foreground="White"
+                                   FontSize="28"
+                                   FontWeight="Bold"
+                                   VerticalAlignment="Center"
+                                   HorizontalAlignment="Right"/>
                     </Grid>
                 </Border>
 
                 <!-- ═══════════════════════════════════════════════════════════ -->
-                <!-- ROW 3: BUTOANE ACȚIUNI -->
+                <!-- ROW 3: BUTOANE ACTIUNI -->
                 <!-- ═══════════════════════════════════════════════════════════ -->
-                <UniformGrid Grid.Row="3" 
-                     Columns="3" 
-                     Margin="5,5,5,10">
-                    <Button Content="ANULARE BON"
-                    Background="#E53935"
-                    Foreground="White"
-                    FontSize="12"
-                    FontWeight="Bold"
-                    Height="50"
-                    Margin="2"
-                    Click="Clear_Click"/>
+                <Border Grid.Row="3" Margin="5,5,5,5">
+                    <Grid>
+                        <controls:BtnUniversal BtnName="ANULARE BON"
+                           BtnColor="#E53935"
+                           Width="85"
+                           Height="60"
+						   Margin="2"
+                           BtnFontSize ="14"
+                           BtnImageStretch="Uniform"
+                           BtnTextHorizontalAlign="Center"
+                           BtnTextVerticalAlign="Center"
+                           BtnBadgeVerticalAlign="Bottom"
+                           BtnImageOpacity="1.0"
+                           Click="Clear_Click" HorizontalAlignment="Left" VerticalAlignment="Top"/>
 
-                    <Button Content="DESCHIDE&#x0a;CASĂ"
-                    Background="#4CAF50"
-                    Foreground="White"
-                    FontSize="12"
-                    FontWeight="Bold"
-                    Height="50"
-                    Margin="2"/>
+                        <controls:BtnUniversal BtnName="RETIPARIRE BON"
+                           BtnColor="#43A047"
+                           Width="85"
+                           Height="60"
+                           Margin="89,2,2,2"               
+                           BtnFontSize ="14"
+                           BtnImageStretch="Uniform"
+                           BtnTextHorizontalAlign="Center"
+                           BtnTextVerticalAlign="Center"
+                           BtnBadgeVerticalAlign="Bottom"
+                           BtnImageOpacity="1.0"
+                           Click="Clear_Click" HorizontalAlignment="Left" VerticalAlignment="Top"/>
 
-                    <Button Content="NOTA DE PLATĂ"
-                    Background="#2196F3"
-                    Foreground="White"
-                    FontSize="12"
-                    FontWeight="Bold"
-                    Height="50"
-                    Margin="2"
-                    Click="SalveazaBonAsteptare_Click"/>
+                        <controls:BtnUniversal BtnName="BON ASTEPTARE"
+                           BtnDetalii="{Binding NumarBonuriInAsteptare}"
+                           BtnColor="#0066CC"
+                           Width="85"
+                           Height="60"
+                           BtnFontSize ="14"
+                           Margin="176,2,2,2"
+                           BtnBadgeVerticalAlign="Top"
+						   HorizontalAlignment="Left"
+						   VerticalAlignment="Top"
+                           Click="BtnBonAsteptare_Click"/>
+                        <controls:BtnUniversal BtnName="INCASARE BON"
+                           BtnColor="#43A047"
+                           Width="113"
+                           Height="122"
+						   Margin="263,2,2,2"
+                           BtnFontSize ="16"
+                           BtnImageStretch="Uniform"
+                           BtnTextHorizontalAlign="Center"
+                           BtnTextVerticalAlign="Bottom"
+                           BtnBadgeVerticalAlign="Bottom"
+                           BtnImageWidth="64"
+                           BtnImageHeight="64"
+                           BtnImageHorizontalAlign="Center"
+                           BtnImageVerticalAlign="Top"
+                           BtnImagePath="/Resources/money.png"
+                           BtnImageOpacity="1.0"
+                           Click="Incasare_Click" HorizontalAlignment="Left" VerticalAlignment="Top"/>
 
-                    <Button Content="ÎNCASARE"
-                    Background="#43A047"
-                    Foreground="White"
-                    FontSize="14"
-                    FontWeight="Bold"
-                    Height="60"
-                    Margin="2"
-                    Grid.ColumnSpan="3"
-                    Click="Pay_Click"/>
-                </UniformGrid>
+                        <controls:BtnUniversal BtnName="OPERATII CASA"
+                           BtnColor="#43A047"
+                           Width="85"
+                           Height="60"
+						   Margin="2,65,2,2"
+                           BtnFontSize ="14"
+                           BtnImageStretch="Uniform"
+                           BtnTextHorizontalAlign="Center"
+                           BtnTextVerticalAlign="Center"
+                           BtnBadgeVerticalAlign="Bottom"
+                           BtnImageOpacity="1.0"
+                           Click="Clear_Click" HorizontalAlignment="Left" VerticalAlignment="Top"/>
+
+                        <controls:BtnUniversal BtnName="FACTURA"
+                           BtnColor="#43A047"
+                           Width="85"
+                           Height="60"
+						   Margin="89,65,2,2"
+                           BtnFontSize ="14"
+                           BtnImageStretch="Uniform"
+                           BtnTextHorizontalAlign="Center"
+                           BtnTextVerticalAlign="Center"
+                           BtnBadgeVerticalAlign="Bottom"
+                           BtnImageOpacity="1.0"
+                           Click="Clear_Click" HorizontalAlignment="Left" VerticalAlignment="Top"/>
+                        <controls:BtnUniversal BtnName="NOTA PLATA"
+                           BtnColor="#43A047"
+                           Width="85"
+                           Height="60"
+						   Margin="176,65,2,2"
+                           BtnFontSize ="14"
+                           BtnImageStretch="Uniform"
+                           BtnTextHorizontalAlign="Center"
+                           BtnTextVerticalAlign="Center"
+                           BtnBadgeVerticalAlign="Bottom"
+                           BtnImageOpacity="1.0"
+                           Click="Clear_Click" HorizontalAlignment="Left" VerticalAlignment="Top"/>
+                    </Grid>
+                </Border>
             </Grid>
         </Border>
-
 
         <!-- ═══════════════════════════════════════════════════════════════ -->
         <!-- ROW 3: FOOTER - FULL WIDTH -->
         <!-- ═══════════════════════════════════════════════════════════════ -->
 
         <Border Grid.Row="3" Grid.ColumnSpan="2" 
-        Background="#5B9BD5" 
-        BorderBrush="#3576B3" 
-        BorderThickness="0,1,0,0"
-        Height="30">
+                Background="#5B9BD5" 
+                BorderBrush="#3576B3" 
+                BorderThickness="0,1,0,0"
+                Height="30">
             <Grid>
                 <!-- ✅ Stânga: Imagine + Status -->
                 <StackPanel Orientation="Horizontal" 
-                    HorizontalAlignment="Left" 
-                    VerticalAlignment="Center">
+                            HorizontalAlignment="Left" 
+                            VerticalAlignment="Center">
 
                     <Image x:Name="IconHelp" 
-                   Source="/Resources/Blue_MSG_INFO22.GIF" 
-                   Width="24" 
-                   Height="24" 
-                   VerticalAlignment="Center"
-                   Margin="4,0,8,0" />
+                           Source="/Resources/Blue_MSG_INFO22.GIF" 
+                           Width="24" 
+                           Height="24" 
+                           VerticalAlignment="Center"
+                           Margin="4,0,8,0" />
 
                     <TextBlock x:Name="StatusText"
-                       Text="Gata pentru comenzi"
-                       Foreground="White"
-                       FontSize="11"
-                       VerticalAlignment="Center"/>
+                               Text="Gata pentru comenzi"
+                               Foreground="White"
+                               FontSize="11"
+                               VerticalAlignment="Center"/>
                 </StackPanel>
 
                 <!-- ✅ Dreapta: Server Info -->
                 <TextBlock x:Name="TextServer"
-                   Text="SERVER: SRV-POS-01 | UTILIZATOR: Admin"
-                   Foreground="White"
-                   FontSize="11"
-                   VerticalAlignment="Center"
-                   HorizontalAlignment="Right"
-                   Margin="0,0,10,0"/>
+                           Text="SERVER: SRV-POS-01 | UTILIZATOR: Admin"
+                           Foreground="White"
+                           FontSize="11"
+                           VerticalAlignment="Center"
+                           HorizontalAlignment="Right"
+                           Margin="0,0,10,0"/>
             </Grid>
         </Border>
 

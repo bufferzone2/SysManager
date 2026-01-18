@@ -1,4 +1,5 @@
-﻿using System.ComponentModel;
+﻿// BonItem.cs
+using System.ComponentModel;
 
 namespace SysManager.Models
 {
@@ -10,7 +11,11 @@ namespace SysManager.Models
         // ═══════════════════════════════════════════════════════════════
         // PROPRIETĂȚI PRINCIPALE
         // ═══════════════════════════════════════════════════════════════
-
+        /// <summary>
+        /// ID-ul produsului pentru care aceasta este garanția
+        /// Null dacă acest item nu este o garanție
+        /// </summary>
+        public int? GarantiePentruProdusId { get; set; }
         /// <summary>
         /// ID-ul produsului din baza de date
         /// </summary>

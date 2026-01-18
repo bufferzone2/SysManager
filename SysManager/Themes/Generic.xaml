@@ -3,6 +3,125 @@
                     xmlns:local="clr-namespace:SysManager.Controls">
 
     <!-- ============================================ -->
+    <!-- STILUL PENTRU Butoane Universale             -->
+    <!-- ============================================ -->
+    <Style TargetType="{x:Type local:BtnUniversal}">
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="{x:Type local:BtnUniversal}">
+                    <Border x:Name="border"
+                        Background="{TemplateBinding BtnColor}"
+                        BorderBrush="#2E5C8A"
+                        BorderThickness="1"
+                        CornerRadius="2">
+                        <Grid>
+                            <!-- ✅ IMAGINE CU BINDING CORECT -->
+                            <Image x:Name="backgroundImage"
+                               Source="{Binding BtnImagePath, RelativeSource={RelativeSource TemplatedParent}}"
+                               Width="{Binding BtnImageWidth, RelativeSource={RelativeSource TemplatedParent}}"
+                               Height="{Binding BtnImageHeight, RelativeSource={RelativeSource TemplatedParent}}"
+                               Stretch="{Binding BtnImageStretch, RelativeSource={RelativeSource TemplatedParent}}"
+                               Opacity="{Binding BtnImageOpacity, RelativeSource={RelativeSource TemplatedParent}}"
+                               HorizontalAlignment="{Binding BtnImageHorizontalAlign, RelativeSource={RelativeSource TemplatedParent}}"
+                               VerticalAlignment="{Binding BtnImageVerticalAlign, RelativeSource={RelativeSource TemplatedParent}}">
+                                <Image.Style>
+                                    <Style TargetType="Image">
+                                        <Style.Triggers>
+                                            <DataTrigger Binding="{Binding BtnImagePath, RelativeSource={RelativeSource TemplatedParent}}" 
+                             Value="{x:Null}">
+                                                <Setter Property="Visibility" Value="Collapsed"/>
+                                            </DataTrigger>
+                                            <DataTrigger Binding="{Binding BtnImagePath, RelativeSource={RelativeSource TemplatedParent}}" 
+                             Value="">
+                                                <Setter Property="Visibility" Value="Collapsed"/>
+                                            </DataTrigger>
+                                        </Style.Triggers>
+                                    </Style>
+                                </Image.Style>
+                            </Image>
+
+                            <!-- TEXT -->
+                            <TextBlock Text="{TemplateBinding BtnName}"
+                                   Foreground="White"
+                                   FontFamily="{TemplateBinding BtnFontFamily}"
+                                   FontSize="{TemplateBinding BtnFontSize}"
+                                   FontWeight="{TemplateBinding BtnFontWeight}"
+                                   FontStyle="{TemplateBinding BtnFontStyle}"
+                                   TextAlignment="Center"
+                                   HorizontalAlignment="{TemplateBinding BtnTextHorizontalAlign}"
+                                   VerticalAlignment="{TemplateBinding BtnTextVerticalAlign}"
+                                   Margin="1"
+                                   TextWrapping="Wrap"/>
+
+                            <!-- BADGE -->
+                            <Border x:Name="badge"
+                                Background="{TemplateBinding BadgeColor}"
+                                BorderBrush="White"
+                                BorderThickness="2"
+                                Width="20"
+                                Height="20"
+                                HorizontalAlignment="{TemplateBinding BtnBadgeHorizontalAlign}"
+                                VerticalAlignment="{TemplateBinding BtnBadgeVerticalAlign}"
+                                Margin="0,0,2,2">
+                                <TextBlock Text="{TemplateBinding BtnDetalii}"
+                                       Foreground="White"
+                                       FontSize="13"
+                                       FontWeight="Bold"
+                                       TextAlignment="Center"
+                                       VerticalAlignment="Center"
+                                       HorizontalAlignment="Center"/>
+                            </Border>
+                        </Grid>
+                    </Border>
+
+                    <ControlTemplate.Triggers>
+                        <!-- Badge visibility -->
+                        <Trigger Property="BadgeVisible" Value="False">
+                            <Setter TargetName="badge" Property="Visibility" Value="Collapsed"/>
+                        </Trigger>
+                        <Trigger Property="BtnDetalii" Value="">
+                            <Setter TargetName="badge" Property="Visibility" Value="Collapsed"/>
+                        </Trigger>
+                        <Trigger Property="BtnDetalii" Value="0">
+                            <Setter TargetName="badge" Property="Visibility" Value="Collapsed"/>
+                        </Trigger>
+
+                        <!-- Badge shape -->
+                        <Trigger Property="BadgeShape" Value="Circle">
+                            <Setter TargetName="badge" Property="CornerRadius" Value="10"/>
+                        </Trigger>
+                        <Trigger Property="BadgeShape" Value="Rectangle">
+                            <Setter TargetName="badge" Property="CornerRadius" Value="0"/>
+                        </Trigger>
+                        <Trigger Property="BadgeShape" Value="RoundedRectangle">
+                            <Setter TargetName="badge" Property="CornerRadius" Value="4"/>
+                        </Trigger>
+
+                        <!-- Button states -->
+                        <Trigger Property="IsMouseOver" Value="True">
+                            <Setter TargetName="border" Property="Background" Value="#0052B8"/>
+                            <Setter TargetName="border" Property="BorderBrush" Value="#4A90E2"/>
+                        </Trigger>
+                        <Trigger Property="IsPressed" Value="True">
+                            <Setter TargetName="border" Property="Background" Value="#003D82"/>
+                            <Setter TargetName="border" Property="BorderBrush" Value="#FFD700"/>
+                        </Trigger>
+                        <Trigger Property="IsSelected" Value="True">
+                            <Setter TargetName="border" Property="Background" Value="#2E7D32"/>
+                            <Setter TargetName="border" Property="BorderBrush" Value="#FFD700"/>
+                            <Setter TargetName="border" Property="BorderThickness" Value="3"/>
+                        </Trigger>
+                        <Trigger Property="IsEnabled" Value="False">
+                            <Setter TargetName="border" Property="Background" Value="#808080"/>
+                            <Setter TargetName="border" Property="Opacity" Value="0.5"/>
+                        </Trigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <!-- ============================================ -->
     <!-- STILUL PENTRU GroupButton (FĂRĂ ANIMAȚII)    -->
     <!-- ============================================ -->
     <Style TargetType="{x:Type local:GroupButton}">
@@ -38,7 +157,8 @@
                                        Foreground="White"
                                        FontSize="12"
                                        TextAlignment="Center"
-                                       Margin="0,0,0,5">
+                                       HorizontalAlignment="Right"
+                                       Margin="0,0,2,5">
                             </TextBlock>
                         </Grid>
                     </Border>
@@ -86,6 +206,7 @@
                         BorderBrush="#8B4513"
                         BorderThickness="2"
                         CornerRadius="3"
+                           
                         Margin="1">
 
                         <TextBlock Text="{TemplateBinding GestiuneName}"
@@ -180,14 +301,14 @@
                                FontWeight="Bold"
                                TextAlignment="Center"
                                VerticalAlignment="Top"
-                               Margin="1"
+                               Margin="1,1,1,0"
                                Padding="0"
                                TextWrapping="Wrap" 
                                FontFamily="Arial"
-                               HorizontalAlignment="Center"/>
+                               HorizontalAlignment="Stretch"/>
 
                             <!-- ✅ PARTEA DE JOS: GESTIUNE (STÂNGA) + PREȚ (DREAPTA) -->
-                            <Grid Grid.Row="2" Margin="2,0,2,2">
+                            <Grid Grid.Row="2" Margin="2,0,2,1">
                                 <Grid.ColumnDefinitions>
                                     <ColumnDefinition Width="Auto"/>
                                     <!-- Gestiune -->
@@ -200,7 +321,7 @@
                                 <!-- ✅ NUMELE GESTIUNII (STÂNGA) -->
                                 <Border Grid.Column="0"
                                         CornerRadius="2"
-                                        Padding="3,1"
+                                        Padding="0"
                                         Margin="0,0,2,0"
                                         VerticalAlignment="Center">
                                     <Border.Style>
@@ -496,8 +617,6 @@
         </Setter>
     </Style>
 
-    <!-- Adaugă acest stil în Generic.xaml, după stilul pentru NumericKeypad -->
-
     <!-- ============================================ -->
     <!-- STILURI PENTRU BUTOANE SearchKeypad          -->
     <!-- ============================================ -->
@@ -625,7 +744,7 @@
         <Setter Property="BorderBrush" Value="#CCCCCC"/>
         <Setter Property="BorderThickness" Value="1"/>
         <Setter Property="Width" Value="700"/>
-        <Setter Property="Height" Value="320"/>
+        <Setter Property="Height" Value="200"/>
         <Setter Property="Template">
             <Setter.Value>
                 <ControlTemplate TargetType="{x:Type local:SearchKeypad}">
@@ -636,8 +755,6 @@
                         Padding="5">
                         <Grid>
                             <Grid.RowDefinitions>
-                                <!-- Display -->
-                                <RowDefinition Height="50"/>
                                 <!-- 5 rânduri butoane -->
                                 <RowDefinition Height="*"/>
                                 <RowDefinition Height="*"/>
@@ -645,29 +762,10 @@
                                 <RowDefinition Height="*"/>
                                 <RowDefinition Height="*"/>
                             </Grid.RowDefinitions>
-
-                            <!-- ═══════════════════════════════════════ -->
-                            <!-- DISPLAY TEXT -->
-                            <!-- ═══════════════════════════════════════ -->
-                            <Border Grid.Row="0"
-                                Background="White"
-                                BorderBrush="#0066CC"
-                                BorderThickness="2"
-                                CornerRadius="4"
-                                Margin="2">
-                                <TextBlock Text="{TemplateBinding CurrentText}"
-                                       FontSize="20"
-                                       FontWeight="Bold"
-                                       Foreground="#0066CC"
-                                       VerticalAlignment="Center"
-                                       Padding="10,0"
-                                       TextTrimming="CharacterEllipsis"/>
-                            </Border>
-
                             <!-- ═══════════════════════════════════════ -->
                             <!-- RÂNDUL 1: 1-9, 0, BACKSPACE -->
                             <!-- ═══════════════════════════════════════ -->
-                            <UniformGrid Grid.Row="1" Rows="1" Columns="11">
+                            <UniformGrid Grid.Row="0" Rows="1" Columns="11">
                                 <Button x:Name="Btn1" Content="1" Style="{StaticResource KeyButtonStyle}"/>
                                 <Button x:Name="Btn2" Content="2" Style="{StaticResource KeyButtonStyle}"/>
                                 <Button x:Name="Btn3" Content="3" Style="{StaticResource KeyButtonStyle}"/>
@@ -684,7 +782,7 @@
                             <!-- ═══════════════════════════════════════ -->
                             <!-- RÂNDUL 2: Q-P -->
                             <!-- ═══════════════════════════════════════ -->
-                            <UniformGrid Grid.Row="2" Rows="1" Columns="11">
+                            <UniformGrid Grid.Row="1" Rows="1" Columns="11">
                                 <Button x:Name="BtnQ" Content="Q" Style="{StaticResource KeyButtonStyle}"/>
                                 <Button x:Name="BtnW" Content="W" Style="{StaticResource KeyButtonStyle}"/>
                                 <Button x:Name="BtnE" Content="E" Style="{StaticResource KeyButtonStyle}"/>
@@ -701,7 +799,7 @@
                             <!-- ═══════════════════════════════════════ -->
                             <!-- RÂNDUL 3: A-L + ENTER -->
                             <!-- ═══════════════════════════════════════ -->
-                            <Grid Grid.Row="3">
+                            <Grid Grid.Row="2">
                                 <Grid.ColumnDefinitions>
                                     <ColumnDefinition Width="*"/>
                                     <ColumnDefinition Width="*"/>
@@ -731,7 +829,7 @@
                             <!-- ═══════════════════════════════════════ -->
                             <!-- RÂNDUL 4: CAPS + Z-M + SHIFT -->
                             <!-- ═══════════════════════════════════════ -->
-                            <Grid Grid.Row="4">
+                            <Grid Grid.Row="3">
                                 <Grid.ColumnDefinitions>
                                     <ColumnDefinition Width="1.5*"/>
                                     <!-- Caps mai lat -->
@@ -758,18 +856,16 @@
                             </Grid>
 
                             <!-- ═══════════════════════════════════════ -->
-                            <!-- RÂNDUL 5: SPAȚIU + ANULARE -->
+                            <!-- RÂNDUL 5: SPAȚIU + CĂUTARE -->
                             <!-- ═══════════════════════════════════════ -->
-                            <Grid Grid.Row="5">
+                            <Grid Grid.Row="4">
                                 <Grid.ColumnDefinitions>
-                                    <ColumnDefinition Width="3*"/>
-                                    <!-- Spațiu foarte lat -->
-                                    <ColumnDefinition Width="*"/>
-                                    <!-- Anulare -->
+
+                                    <!-- Spațiu lat -->
+
                                 </Grid.ColumnDefinitions>
 
                                 <Button x:Name="BtnSpace" Grid.Column="0" Content="SPAȚIU" Style="{StaticResource KeySpaceButtonStyle}"/>
-                                <Button x:Name="BtnCancel" Grid.Column="1" Content="ANULARE" Style="{StaticResource KeyCancelButtonStyle}"/>
                             </Grid>
 
                         </Grid>
@@ -778,6 +874,7 @@
             </Setter.Value>
         </Setter>
     </Style>
+
 
 
 </ResourceDictionary>

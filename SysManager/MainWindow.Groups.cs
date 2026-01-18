@@ -89,7 +89,7 @@ namespace SysManager
         {
             try
             {
-                Logs.Write($"LoadGroups: START încărcare grupe pentru gestiune ID={_selectedGestiuneId}");
+                //Logs.Write($"LoadGroups: START încărcare grupe pentru gestiune ID={_selectedGestiuneId}");
 
                 _allButtons.Clear();
 
@@ -98,7 +98,7 @@ namespace SysManager
 
                 int totalArticole = grupe.Sum(g => g.NumarArticole);
 
-                Logs.Write($"📊 GRUPE PENTRU GESTIUNE {_selectedGestiuneId}: {grupe.Count} grupe, {totalArticole} articole");
+                //Logs.Write($"📊 GRUPE PENTRU GESTIUNE {_selectedGestiuneId}: {grupe.Count} grupe, {totalArticole} articole");
 
                 // ✅ 1) TOATE GRUPELE (primul buton)
                 var btnAll = new GroupButton
@@ -136,16 +136,16 @@ namespace SysManager
                     _allButtons.Add(btn);
                 }
 
-                Logs.Write($"📊 TOTAL BUTOANE CREATE: {_allButtons.Count} (1 TOATE GRUPELE + {grupe.Count} grupe)");
+                //Logs.Write($"📊 TOTAL BUTOANE CREATE: {_allButtons.Count} (1 TOATE GRUPELE + {grupe.Count} grupe)");
 
                 // ✅ CALCUL PAGINARE
                 _totalPages = (int)Math.Ceiling((double)_allButtons.Count / _buttonsPerPage);
                 _currentPage = 0;
 
-                Logs.Write($"📊 PAGINARE CALCULATĂ:");
-                Logs.Write($"   → Butoane totale: {_allButtons.Count}");
-                Logs.Write($"   → Butoane per pagină: {_buttonsPerPage}");
-                Logs.Write($"   → Total pagini: {_totalPages}");
+                //Logs.Write($"📊 PAGINARE CALCULATĂ:");
+                //Logs.Write($"   → Butoane totale: {_allButtons.Count}");
+                //Logs.Write($"   → Butoane per pagină: {_buttonsPerPage}");
+                //Logs.Write($"   → Total pagini: {_totalPages}");
 
                 //TotalProducts.Text = $"{totalArticole} articole";
                 //SelectedGroup.Text = "Toate grupele";
@@ -158,15 +158,14 @@ namespace SysManager
                     : _gestiuni.FirstOrDefault(g => g.Id == _selectedGestiuneId)?.DisplayName ?? "Gestiune";
 
                 StatusText.Text = $"Încărcate {grupe.Count} grupe ({gestiuneName})";
-                Logs.Write($"LoadGroups: SUCCESS");
+                //Logs.Write($"LoadGroups: SUCCESS");
             }
             catch (Exception ex)
             {
                 Logs.Write("EROARE la încărcarea grupelor:");
                 Logs.Write(ex);
                 StatusText.Text = "EROARE la încărcarea grupelor!";
-                MessageBox.Show($"Eroare la încărcarea grupelor:\n{ex.Message}", "Eroare",
-                    MessageBoxButton.OK, MessageBoxImage.Error);
+                //MessageBox.Show($"Eroare la încărcarea grupelor:\n{ex.Message}", "Eroare", MessageBoxButton.OK, MessageBoxImage.Error);
             }
         }
 
@@ -196,14 +195,14 @@ namespace SysManager
                 GroupsPanel.UpdateLayout();
 
                 // ✅ DEBUG: Verifică dimensiuni REALE
-                Logs.Write($"🔍 DEBUG DIMENSIUNI DUPĂ ADĂUGARE:");
-                Logs.Write($"   GroupsPanel.Children.Count = {GroupsPanel.Children.Count}");
-                Logs.Write($"   GroupsPanel.ActualWidth = {GroupsPanel.ActualWidth}");
-                Logs.Write($"   GroupsPanel.ActualHeight = {GroupsPanel.ActualHeight}");
+                //Logs.Write($"🔍 DEBUG DIMENSIUNI DUPĂ ADĂUGARE:");
+                //Logs.Write($"   GroupsPanel.Children.Count = {GroupsPanel.Children.Count}");
+                //Logs.Write($"   GroupsPanel.ActualWidth = {GroupsPanel.ActualWidth}");
+                //Logs.Write($"   GroupsPanel.ActualHeight = {GroupsPanel.ActualHeight}");
 
                 UpdateNavigationButtons();
 
-                Logs.Write($"📄 PAGINA {_currentPage + 1}/{_totalPages}: Afișate {end - start} butoane (index {start}-{end - 1})");
+                //Logs.Write($"📄 PAGINA {_currentPage + 1}/{_totalPages}: Afișate {end - start} butoane (index {start}-{end - 1})");
             }
             catch (Exception ex)
             {
@@ -250,14 +249,14 @@ namespace SysManager
                     //SelectedGroup.Text = btn.GroupName;
 
                     // ✅ Mesaj diferit pentru "TOATE GRUPELE"
-                    if (btn.GroupId == 0)
-                    {
-                        Logs.Write($"📂 Selectat: TOATE GRUPELE");
-                    }
-                    else
-                    {
-                        Logs.Write($"📂 Grupă selectată: '{btn.GroupName}' (ID: {btn.GroupId})");
-                    }
+                    //if (btn.GroupId == 0)
+                    //{
+                    //    Logs.Write($"📂 Selectat: TOATE GRUPELE");
+                    //}
+                    //else
+                    //{
+                    //    Logs.Write($"📂 Grupă selectată: '{btn.GroupName}' (ID: {btn.GroupId})");
+                    //}
 
                     // ✅ REÎNCARCĂ PRODUSELE
                     LoadProducts();

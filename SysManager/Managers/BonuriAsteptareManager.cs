@@ -1,4 +1,5 @@
-﻿using System;
+﻿//Fisier:BonuriAsteptareManager.cs
+using System;
 using System.Collections.Generic;
 using FirebirdSql.Data.FirebirdClient;
 using SysManager.Models;
@@ -20,18 +21,18 @@ namespace SysManager.Managers
         /// </summary>
         public int SalveazaBonInAsteptare(BonAsteptare bon)
         {
-            using (var conn = DbConnectionFactory.GetOpenConnection()) // ✅ FOLOSEȘTE DbConnectionFactory
+            using (var conn = DbConnectionFactory.GetOpenConnection())
             {
                 using (var trans = conn.BeginTransaction())
                 {
                     try
                     {
-                        // 1. Inserează header
+                        // 1. Inserează header (RĂMÂNE NESCHIMBAT)
                         string sqlHeader = @"
-                            INSERT INTO BONURI_ASTEPTARE 
-                            (NR_BON, DATA_CREARE, ID_UTILIZATOR, ID_GESTIUNE, TOTAL, OBSERVATII, NUME_CLIENT, STATUS)
-                            VALUES (@NrBon, @DataCreare, @IdUtilizator, @IdGestiune, @Total, @Observatii, @NumeClient, @Status)
-                            RETURNING ID";
+                    INSERT INTO BONURI_ASTEPTARE 
+                    (NR_BON, DATA_CREARE, ID_UTILIZATOR, ID_GESTIUNE, TOTAL, OBSERVATII, NUME_CLIENT, STATUS)
+                    VALUES (@NrBon, @DataCreare, @IdUtilizator, @IdGestiune, @Total, @Observatii, @NumeClient, @Status)
+                    RETURNING ID";
 
                         int bonId;
                         using (var cmd = new FbCommand(sqlHeader, conn, trans))
@@ -48,11 +49,11 @@ namespace SysManager.Managers
                             bonId = Convert.ToInt32(cmd.ExecuteScalar());
                         }
 
-                        // 2. Inserează detaliile
+                        // ✅ 2. MODIFICĂ AICI - adaugă ESTE_GARANTIE în INSERT
                         string sqlDetalii = @"
-                            INSERT INTO BONURI_ASTEPTARE_DETALII 
-                            (ID_BON_ASTEPTARE, ID_PRODUS, DENUMIRE_PRODUS, CANTITATE, PRET_UNITAR, VALOARE)
-                            VALUES (@IdBon, @IdProdus, @Denumire, @Cantitate, @PretUnitar, @Valoare)";
+                    INSERT INTO BONURI_ASTEPTARE_DETALII 
+                    (ID_BON_ASTEPTARE, ID_PRODUS, DENUMIRE_PRODUS, CANTITATE, PRET_UNITAR, VALOARE, ESTE_GARANTIE)
+                    VALUES (@IdBon, @IdProdus, @Denumire, @Cantitate, @PretUnitar, @Valoare, @EsteGarantie)";
 
                         foreach (var detaliu in bon.Detalii)
                         {
@@ -64,6 +65,7 @@ namespace SysManager.Managers
                                 cmd.Parameters.AddWithValue("@Cantitate", detaliu.Cantitate);
                                 cmd.Parameters.AddWithValue("@PretUnitar", detaliu.PretUnitar);
                                 cmd.Parameters.AddWithValue("@Valoare", detaliu.Valoare);
+                                cmd.Parameters.AddWithValue("@EsteGarantie", detaliu.EsteGarantie ? 1 : 0);  // ← ADAUGĂ
                                 cmd.ExecuteNonQuery();
                             }
                         }
@@ -133,14 +135,14 @@ namespace SysManager.Managers
         {
             BonAsteptare bon = null;
 
-            using (var conn = DbConnectionFactory.GetOpenConnection()) // ✅ FOLOSEȘTE DbConnectionFactory
+            using (var conn = DbConnectionFactory.GetOpenConnection())
             {
-                // 1. Încarcă header
+                // 1. Încarcă header (RĂMÂNE NESCHIMBAT)
                 string sqlHeader = @"
-                    SELECT ID, NR_BON, DATA_CREARE, ID_UTILIZATOR, ID_GESTIUNE, 
-                           TOTAL, OBSERVATII, NUME_CLIENT, STATUS
-                    FROM BONURI_ASTEPTARE
-                    WHERE ID = @Id";
+            SELECT ID, NR_BON, DATA_CREARE, ID_UTILIZATOR, ID_GESTIUNE, 
+                   TOTAL, OBSERVATII, NUME_CLIENT, STATUS
+            FROM BONURI_ASTEPTARE
+            WHERE ID = @Id";
 
                 using (var cmd = new FbCommand(sqlHeader, conn))
                 {
@@ -171,11 +173,12 @@ namespace SysManager.Managers
                     return null;
                 }
 
-                // 2. Încarcă detaliile
+                // ✅ 2. MODIFICĂ AICI - adaugă ESTE_GARANTIE în SELECT
                 string sqlDetalii = @"
-                    SELECT ID, ID_PRODUS, DENUMIRE_PRODUS, CANTITATE, PRET_UNITAR, VALOARE
-                    FROM BONURI_ASTEPTARE_DETALII
-                    WHERE ID_BON_ASTEPTARE = @IdBon";
+            SELECT ID, ID_PRODUS, DENUMIRE_PRODUS, CANTITATE, PRET_UNITAR, VALOARE, ESTE_GARANTIE
+            FROM BONURI_ASTEPTARE_DETALII
+            WHERE ID_BON_ASTEPTARE = @IdBon
+            ORDER BY ID";  // ← Important pentru ordinea corectă
 
                 using (var cmd = new FbCommand(sqlDetalii, conn))
                 {
@@ -192,16 +195,18 @@ namespace SysManager.Managers
                                 DenumireProdus = reader.GetString(2),
                                 Cantitate = reader.GetDecimal(3),
                                 PretUnitar = reader.GetDecimal(4),
-                                Valoare = reader.GetDecimal(5)
+                                Valoare = reader.GetDecimal(5),
+                                EsteGarantie = reader.IsDBNull(6) ? false : reader.GetInt16(6) == 1  // ← ADAUGĂ
                             });
                         }
                     }
                 }
             }
 
-            Logs.Write($"✅ Bon #{bon.NrBon} încărcat cu {bon.Detalii.Count} produse");
+            Logs.Write($"✅ Bon #{bon.NrBon} încărcat cu {bon.Detalii.Count} linii");
             return bon;
         }
+
 
         /// <summary>
         /// Șterge bonul din așteptare

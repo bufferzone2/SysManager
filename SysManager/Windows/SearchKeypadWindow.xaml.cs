@@ -5,8 +5,8 @@ using System.Windows.Controls;
 namespace SysManager.Windows
 {
     /// <summary>
-    /// Fereastră pentru căutarea articolelor folosind tastatura alfanumerică
-    /// Actualizează TextBox-ul în TIMP REAL pe măsură ce utilizatorul tastează
+    /// Fereastră NON-MODAL pentru căutarea articolelor folosind tastatura alfanumerică
+    /// Se închide automat când pierde focus-ul
     /// </summary>
     public partial class SearchKeypadWindow : Window
     {
@@ -22,27 +22,14 @@ namespace SysManager.Windows
         /// </summary>
         private TextBox _targetTextBox;
 
+        /// <summary>
+        /// Flag pentru a preveni închiderea accidentală
+        /// </summary>
+        private bool _isSearchInProgress = false;
+
         #endregion
 
         #region === CONSTRUCTOR ===
-
-        /// <summary>
-        /// Constructor implicit - pornește gol
-        /// </summary>
-        public SearchKeypadWindow()
-        {
-            InitializeComponent();
-            InitializeKeypad("", null);
-        }
-
-        /// <summary>
-        /// Constructor cu text inițial
-        /// </summary>
-        public SearchKeypadWindow(string initialText)
-        {
-            InitializeComponent();
-            InitializeKeypad(initialText, null);
-        }
 
         /// <summary>
         /// Constructor cu text inițial și TextBox target pentru update în timp real
@@ -51,11 +38,59 @@ namespace SysManager.Windows
         {
             InitializeComponent();
             InitializeKeypad(initialText, targetTextBox);
+
+            // ✅ Poziționează fereastra DUPĂ ce e loaded
+            this.Loaded += Window_Loaded;
         }
 
         #endregion
 
         #region === INIȚIALIZARE ===
+
+        /// <summary>
+        /// Event handler pentru Window Loaded - poziționează fereastra la baza ecranului
+        /// </summary>
+        private void Window_Loaded(object sender, RoutedEventArgs e)
+        {
+            PositionWindowAtBottomCenter();
+        }
+
+        /// <summary>
+        /// Poziționează fereastra la baza ecranului și centrată orizontal
+        /// </summary>
+        private void PositionWindowAtBottomCenter()
+        {
+            try
+            {
+                // ✅ Obține dimensiunile ecranului de lucru (fără taskbar)
+                var workingArea = SystemParameters.WorkArea;
+
+                // ✅ Asigură-te că fereastra are dimensiuni actualizate
+                this.UpdateLayout();
+
+                // ✅ Folosește ActualWidth/ActualHeight în loc de Width/Height
+                double actualWidth = this.ActualWidth > 0 ? this.ActualWidth : this.Width;
+                double actualHeight = this.ActualHeight > 0 ? this.ActualHeight : this.Height;
+
+                // ✅ Calculează poziția X (centrat orizontal)
+                double centerX = (workingArea.Width - actualWidth) / 2;
+                if (centerX < 0) centerX = 0;
+
+                this.Left = centerX;
+
+                // ✅ Calculează poziția Y (la baza ecranului, cu spațiu de 10px)
+                double bottomY = workingArea.Height - actualHeight - 10;
+                if (bottomY < 0) bottomY = 0;
+
+                this.Top = bottomY;
+
+                Logs.Write($"SearchKeypadWindow: Poziționat la X={this.Left:F0}, Y={this.Top:F0} (Ecran: {workingArea.Width:F0}x{workingArea.Height:F0}, Fereastră: {actualWidth:F0}x{actualHeight:F0})");
+            }
+            catch (Exception ex)
+            {
+                Logs.Write($"SearchKeypadWindow: EROARE la poziționare: {ex.Message}");
+            }
+        }
 
         /// <summary>
         /// Inițializează tastatura cu textul inițial și event handlers
@@ -70,17 +105,12 @@ namespace SysManager.Windows
             // ✅ ADAUGĂ EVENT HANDLER PENTRU SCHIMBAREA TEXTULUI ÎN TIMP REAL
             Keypad.TextChanged += Keypad_TextChanged;
 
-            // Înregistrează event handlers existente
+            // Înregistrează event handler pentru căutare
             Keypad.SearchRequested += Keypad_SearchRequested;
-            Keypad.Cancelled += Keypad_Cancelled;
 
             Keypad.MaxLength = 50;
 
-            Logs.Write($"SearchKeypadWindow: Inițializat cu textul '{initialText}'");
-            if (_targetTextBox != null)
-            {
-                Logs.Write($"SearchKeypadWindow: TextBox target setat pentru update în timp real");
-            }
+            Logs.Write($"SearchKeypadWindow: Inițializat cu textul '{initialText}' (NON-MODAL)");
         }
 
         #endregion
@@ -118,6 +148,8 @@ namespace SysManager.Windows
         {
             try
             {
+                _isSearchInProgress = true;
+
                 // Salvează textul
                 EnteredText = text;
 
@@ -132,79 +164,50 @@ namespace SysManager.Windows
 
                 Logs.Write($"SearchKeypadWindow: Căutare confirmată: '{text}'");
 
-                // Închide fereastra cu succes
-                DialogResult = true;
-                Close();
+                // ✅ ÎNCHIDE FEREASTRA
+                this.Close();
             }
             catch (Exception ex)
             {
                 Logs.Write($"SearchKeypadWindow: Eroare la confirmarea căutării: {ex.Message}");
-                MessageBox.Show($"Eroare la procesarea textului:\n{ex.Message}",
-                    "Eroare",
-                    MessageBoxButton.OK,
-                    MessageBoxImage.Error);
+            }
+            finally
+            {
+                _isSearchInProgress = false;
             }
         }
 
         /// <summary>
-        /// Event handler pentru Cancel pe tastatură
+        /// Când fereastra pierde focus-ul, se închide automat
+        /// DAR nu se închide dacă focus-ul merge la Owner (MainWindow)
         /// </summary>
-        private void Keypad_Cancelled(object sender, EventArgs e)
+        private void Window_Deactivated(object sender, EventArgs e)
         {
-            Logs.Write("SearchKeypadWindow: Anulat de utilizator");
-
-            // Nu salvează textul
-            EnteredText = null;
-
-            // ✅ RESTAUREAZĂ TEXTUL INIȚIAL ÎN TEXTBOX (dacă a fost setat)
-            if (_targetTextBox != null && !string.IsNullOrEmpty(_targetTextBox.Text))
+            // Nu închide dacă e în progress o căutare
+            if (_isSearchInProgress)
             {
-                string initialText = _targetTextBox.Text;
-                _targetTextBox.Dispatcher.Invoke(() =>
+                return;
+            }
+
+            // ✅ VERIFICĂ DACĂ FOCUS-UL A FOST PRELUAT DE OWNER (MainWindow)
+            // Dacă da, nu închide fereastra (user a dat click pe buton în MainWindow)
+            this.Dispatcher.BeginInvoke(new Action(() =>
+            {
+                // Verifică dacă owner-ul este activ
+                if (this.Owner != null && this.Owner.IsActive)
                 {
-                    _targetTextBox.Text = initialText;
-                });
-            }
+                    // Focus-ul e pe MainWindow, nu închide tastatura
+                    Logs.Write("SearchKeypadWindow: Focus pe MainWindow, nu închide");
+                    return;
+                }
 
-            // Închide fereastra fără succes
-            DialogResult = false;
-            Close();
-        }
-
-        #endregion
-
-        #region === METODE STATICE HELPER ===
-
-        /// <summary>
-        /// Metodă statică pentru afișarea rapidă a tastaturii CU UPDATE ÎN TIMP REAL
-        /// </summary>
-        public static string ShowDialog(Window owner, TextBox targetTextBox, string initialText = "", string title = "CĂUTARE ARTICOL")
-        {
-            var window = new SearchKeypadWindow(initialText, targetTextBox)
-            {
-                Owner = owner,
-                Title = title
-            };
-
-            bool? result = window.ShowDialog();
-
-            return result == true ? window.EnteredText : null;
-        }
-
-        /// <summary>
-        /// Metodă statică pentru afișarea tastaturii FĂRĂ TextBox target (backward compatibility)
-        /// </summary>
-        public static string ShowDialog(Window owner, string initialText = "", string title = "CĂUTARE ARTICOL")
-        {
-            var window = new SearchKeypadWindow(initialText, null)
-            {
-                Owner = owner,
-                Title = title
-            };
-
-            bool? result = window.ShowDialog();
-
-            return result == true ? window.EnteredText : null;
+                // Verifică dacă această fereastră încă există și nu e activă
+                if (!this.IsActive && this.IsLoaded)
+                {
+                    Logs.Write("SearchKeypadWindow: Închis automat (pierdere focus)");
+                    this.Close();
+                }
+            }), System.Windows.Threading.DispatcherPriority.ApplicationIdle);
         }
 
         #endregion

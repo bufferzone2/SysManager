@@ -6,7 +6,9 @@
         Height="500"
         WindowStartupLocation="CenterOwner"
         Background="#F5F5F5"
-        ResizeMode="CanResize" ShowInTaskbar="False" WindowStyle="None">
+        ResizeMode="CanResize" 
+        ShowInTaskbar="False" 
+        WindowStyle="None">
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
@@ -26,63 +28,199 @@
         </Border>
 
         <!-- ═══════════════════════════════════════════════ -->
-        <!-- LISTĂ BONURI -->
+        <!-- LISTĂ BONURI CU SCROLL CONTROLAT -->
         <!-- ═══════════════════════════════════════════════ -->
-        <ListView x:Name="BonuriListView"
-                  Grid.Row="1"
-                  Margin="10"
-                  SelectionMode="Single"
-                  MouseDoubleClick="BonuriListView_MouseDoubleClick"
-                  Background="Transparent"
-                  BorderThickness="0">
-            <ListView.ItemTemplate>
-                <DataTemplate>
-                    <Border Background="White"
-                            BorderBrush="#CCCCCC"
-                            BorderThickness="1"
-                            CornerRadius="4"
-                            Padding="15"
-                            Margin="5">
-                        <Grid>
-                            <Grid.ColumnDefinitions>
-                                <ColumnDefinition Width="*"/>
-                                <ColumnDefinition Width="Auto"/>
-                            </Grid.ColumnDefinitions>
+        <Grid Grid.Row="1" Margin="10">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*"/>
+                <!-- Lista bonuri -->
+                <ColumnDefinition Width="80"/>
+                <!-- Butoane scroll -->
+            </Grid.ColumnDefinitions>
 
-                            <!-- ✅ Informații Bon -->
-                            <StackPanel Grid.Column="0">
-                                <TextBlock Text="{Binding DisplayText}"
-                                           FontSize="16"
-                                           FontWeight="Bold"
-                                           Foreground="#333333"/>
-                                <TextBlock Text="{Binding DisplayInfo}"
-                                           FontSize="12"
-                                           Foreground="#666666"
-                                           Margin="0,5,0,0"/>
-                                <TextBlock Text="{Binding Observatii}"
-                                           FontSize="11"
-                                           Foreground="#999999"
-                                           Margin="0,3,0,0"
-                                           TextWrapping="Wrap"/>
-                            </StackPanel>
+            <!-- LISTA BONURI -->
+            <ScrollViewer x:Name="BonuriScrollViewer"
+                          Grid.Column="0"
+                          VerticalScrollBarVisibility="Hidden"
+                          HorizontalScrollBarVisibility="Disabled">
+                <ItemsControl x:Name="BonuriListView">
+                    <ItemsControl.ItemTemplate>
+                        <DataTemplate>
+                            <Border Background="White"
+                                    BorderBrush="#CCCCCC"
+                                    BorderThickness="1"
+                                    CornerRadius="4"
+                                    Padding="15"
+                                    Margin="0,0,0,10"
+                                    Cursor="Hand"
+                                    MouseLeftButtonDown="BonCard_Click"
+                                    Tag="{Binding}">
+                                <Border.Style>
+                                    <Style TargetType="Border">
+                                        <Style.Triggers>
+                                            <Trigger Property="IsMouseOver" Value="True">
+                                                <Setter Property="Background" Value="#E3F2FD"/>
+                                                <Setter Property="BorderBrush" Value="#2196F3"/>
+                                            </Trigger>
+                                        </Style.Triggers>
+                                    </Style>
+                                </Border.Style>
 
-                            <!-- ✅ Buton Șterge -->
-                            <Button Grid.Column="1"
-                                    Content="🗑️"
-                                    Width="40"
-                                    Height="40"
-                                    Background="#E53935"
-                                    Foreground="White"
-                                    FontSize="18"
-                                    ToolTip="Șterge bonul"
-                                    Click="DeleteBon_Click"
-                                    Tag="{Binding Id}"
-                                    VerticalAlignment="Center"/>
-                        </Grid>
-                    </Border>
-                </DataTemplate>
-            </ListView.ItemTemplate>
-        </ListView>
+                                <Grid>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="*"/>
+                                        <ColumnDefinition Width="Auto"/>
+                                    </Grid.ColumnDefinitions>
+
+                                    <!-- ✅ Informații Bon -->
+                                    <StackPanel Grid.Column="0">
+                                        <TextBlock Text="{Binding DisplayText}"
+                                                   FontSize="16"
+                                                   FontWeight="Bold"
+                                                   Foreground="#333333"/>
+                                        <TextBlock Text="{Binding DisplayInfo}"
+                                                   FontSize="12"
+                                                   Foreground="#666666"
+                                                   Margin="0,5,0,0"/>
+                                        <TextBlock Text="{Binding Observatii}"
+                                                   FontSize="11"
+                                                   Foreground="#999999"
+                                                   Margin="0,3,0,0"
+                                                   TextWrapping="Wrap"/>
+                                    </StackPanel>
+
+                                    <!-- ✅ Buton Șterge -->
+                                    <Button Grid.Column="1"
+                                            Content="🗑️"
+                                            Width="50"
+                                            Height="50"
+                                            Background="#E53935"
+                                            Foreground="White"
+                                            FontSize="18"
+                                            ToolTip="Șterge bonul"
+                                            Click="DeleteBon_Click"
+                                            Tag="{Binding Id}"
+                                            VerticalAlignment="Center"
+                                            Margin="10,0,0,0">
+                                        <Button.Style>
+                                            <Style TargetType="Button">
+                                                <Setter Property="Template">
+                                                    <Setter.Value>
+                                                        <ControlTemplate TargetType="Button">
+                                                            <Border x:Name="border"
+                                                                    Background="{TemplateBinding Background}"
+                                                                    BorderBrush="#C62828"
+                                                                    BorderThickness="2"
+                                                                    CornerRadius="4">
+                                                                <ContentPresenter HorizontalAlignment="Center" 
+                                                                                  VerticalAlignment="Center"/>
+                                                            </Border>
+                                                            <ControlTemplate.Triggers>
+                                                                <Trigger Property="IsMouseOver" Value="True">
+                                                                    <Setter TargetName="border" Property="Background" Value="#D32F2F"/>
+                                                                </Trigger>
+                                                                <Trigger Property="IsPressed" Value="True">
+                                                                    <Setter TargetName="border" Property="Background" Value="#B71C1C"/>
+                                                                </Trigger>
+                                                            </ControlTemplate.Triggers>
+                                                        </ControlTemplate>
+                                                    </Setter.Value>
+                                                </Setter>
+                                            </Style>
+                                        </Button.Style>
+                                    </Button>
+                                </Grid>
+                            </Border>
+                        </DataTemplate>
+                    </ItemsControl.ItemTemplate>
+                </ItemsControl>
+            </ScrollViewer>
+
+            <!-- BUTOANE SCROLL (Sus/Jos) -->
+            <StackPanel Grid.Column="1" 
+                        Orientation="Vertical"
+                        VerticalAlignment="Center"
+                        Margin="10,0,0,0">
+
+                <!-- Buton Scroll SUS -->
+                <Button x:Name="BtnScrollUp"
+                        Content="▲"
+                        Background="#0066CC"
+                        Foreground="White"
+                        FontSize="24"
+                        FontWeight="Bold"
+                        Height="80"
+                        Margin="0,0,0,10"
+                        Click="BtnScrollUp_Click"
+                        ToolTip="Derulare sus">
+                    <Button.Style>
+                        <Style TargetType="Button">
+                            <Setter Property="Template">
+                                <Setter.Value>
+                                    <ControlTemplate TargetType="Button">
+                                        <Border x:Name="border"
+                                                Background="{TemplateBinding Background}"
+                                                BorderBrush="#004C99"
+                                                BorderThickness="2"
+                                                CornerRadius="4">
+                                            <ContentPresenter HorizontalAlignment="Center" 
+                                                              VerticalAlignment="Center"/>
+                                        </Border>
+                                        <ControlTemplate.Triggers>
+                                            <Trigger Property="IsMouseOver" Value="True">
+                                                <Setter TargetName="border" Property="Background" Value="#0052A3"/>
+                                            </Trigger>
+                                            <Trigger Property="IsPressed" Value="True">
+                                                <Setter TargetName="border" Property="Background" Value="#003D82"/>
+                                            </Trigger>
+                                        </ControlTemplate.Triggers>
+                                    </ControlTemplate>
+                                </Setter.Value>
+                            </Setter>
+                        </Style>
+                    </Button.Style>
+                </Button>
+
+                <!-- Buton Scroll JOS -->
+                <Button x:Name="BtnScrollDown"
+                        Content="▼"
+                        Background="#0066CC"
+                        Foreground="White"
+                        FontSize="24"
+                        FontWeight="Bold"
+                        Height="80"
+                        Margin="0"
+                        Click="BtnScrollDown_Click"
+                        ToolTip="Derulare jos">
+                    <Button.Style>
+                        <Style TargetType="Button">
+                            <Setter Property="Template">
+                                <Setter.Value>
+                                    <ControlTemplate TargetType="Button">
+                                        <Border x:Name="border"
+                                                Background="{TemplateBinding Background}"
+                                                BorderBrush="#004C99"
+                                                BorderThickness="2"
+                                                CornerRadius="4">
+                                            <ContentPresenter HorizontalAlignment="Center" 
+                                                              VerticalAlignment="Center"/>
+                                        </Border>
+                                        <ControlTemplate.Triggers>
+                                            <Trigger Property="IsMouseOver" Value="True">
+                                                <Setter TargetName="border" Property="Background" Value="#0052A3"/>
+                                            </Trigger>
+                                            <Trigger Property="IsPressed" Value="True">
+                                                <Setter TargetName="border" Property="Background" Value="#003D82"/>
+                                            </Trigger>
+                                        </ControlTemplate.Triggers>
+                                    </ControlTemplate>
+                                </Setter.Value>
+                            </Setter>
+                        </Style>
+                    </Button.Style>
+                </Button>
+            </StackPanel>
+        </Grid>
 
         <!-- ═══════════════════════════════════════════════ -->
         <!-- BUTOANE ACȚIUNI -->
@@ -91,21 +229,11 @@
                     Orientation="Horizontal"
                     HorizontalAlignment="Right"
                     Margin="10">
-            <Button Content="ÎNCARCĂ BON"
-                    Width="150"
-                    Height="50"
-                    Background="#4CAF50"
-                    Foreground="White"
-                    FontSize="14"
-                    FontWeight="Bold"
-                    Margin="0,0,10,0"
-                    Click="IncarcaBon_Click"
-                    ToolTip="Încarcă bonul selectat în grid"/>
 
             <Button Content="ANULARE"
                     Width="150"
                     Height="50"
-                    Background="#999999"
+                    Background="IndianRed"
                     Foreground="White"
                     FontSize="14"
                     FontWeight="Bold"

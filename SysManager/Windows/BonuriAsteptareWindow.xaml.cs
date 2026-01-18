@@ -1,4 +1,5 @@
-﻿using System;
+﻿//BonuriAsteptareWindow.xaml.cs
+using System;
 using System.Collections.Generic;
 using System.Windows;
 using System.Windows.Controls;
@@ -15,6 +16,7 @@ namespace SysManager
     {
         private readonly BonuriAsteptareManager _manager;
         private List<BonAsteptare> _bonuri;
+        private BonAsteptare _bonSelectat;
 
         /// <summary>
         /// Bonul selectat de utilizator
@@ -30,18 +32,34 @@ namespace SysManager
 
             // Populează lista
             BonuriListView.ItemsSource = _bonuri;
-
-            // Selectează primul bon automat
-            if (_bonuri.Count > 0)
-                BonuriListView.SelectedIndex = 0;
         }
 
         /// <summary>
-        /// Double-click pe bon → Încarcă automat
+        /// Click pe card-ul unui bon → Selectează și încarcă
         /// </summary>
-        private void BonuriListView_MouseDoubleClick(object sender, MouseButtonEventArgs e)
+        private void BonCard_Click(object sender, MouseButtonEventArgs e)
         {
-            IncarcaBon_Click(null, null);
+            try
+            {
+                var border = sender as Border;
+                if (border == null) return;
+
+                var bonSelectat = border.Tag as BonAsteptare;
+                if (bonSelectat == null) return;
+
+                // Salvează selecția
+                _bonSelectat = bonSelectat;
+
+                // Încarcă bonul direct (comportament dublu-click)
+                IncarcaBonSelectat();
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Eroare la selectarea bonului: {ex.Message}",
+                    "Eroare", MessageBoxButton.OK, MessageBoxImage.Error);
+                Logs.Write("EROARE selectare bon:");
+                Logs.Write(ex);
+            }
         }
 
         /// <summary>
@@ -49,25 +67,38 @@ namespace SysManager
         /// </summary>
         private void IncarcaBon_Click(object sender, RoutedEventArgs e)
         {
+            if (_bonSelectat == null)
+            {
+                MessageBox.Show("Selectează un bon din listă apăsând pe el!",
+                    "Atenție", MessageBoxButton.OK, MessageBoxImage.Warning);
+                return;
+            }
+
+            IncarcaBonSelectat();
+        }
+
+        /// <summary>
+        /// Încarcă bonul selectat din DB
+        /// </summary>
+        private void IncarcaBonSelectat()
+        {
             try
             {
-                if (BonuriListView.SelectedItem == null)
-                {
-                    MessageBox.Show("Selectează un bon din listă!",
-                        "Atenție", MessageBoxButton.OK, MessageBoxImage.Warning);
-                    return;
-                }
-
-                var bonSelectat = BonuriListView.SelectedItem as BonAsteptare;
+                if (_bonSelectat == null) return;
 
                 // Încarcă detaliile complete din DB
-                BonSelectat = _manager.IncarcaBon(bonSelectat.Id);
+                BonSelectat = _manager.IncarcaBon(_bonSelectat.Id);
 
                 if (BonSelectat == null)
                 {
                     MessageBox.Show("Eroare la încărcarea bonului!",
                         "Eroare", MessageBoxButton.OK, MessageBoxImage.Error);
                     return;
+                }
+                else
+                {
+                    // Șterge din DB bonul pe care l-am incarcat in grid
+                    _manager.StergeBon(_bonSelectat.Id);
                 }
 
                 DialogResult = true;
@@ -112,16 +143,15 @@ namespace SysManager
                     BonuriListView.ItemsSource = null;
                     BonuriListView.ItemsSource = _bonuri;
 
-                    MessageBox.Show("Bon șters cu succes!",
-                        "Succes", MessageBoxButton.OK, MessageBoxImage.Information);
+                    // Resetează selecția dacă bonul șters era selectat
+                    if (_bonSelectat != null && _bonSelectat.Id == bonId)
+                        _bonSelectat = null;
 
                     Logs.Write($"Bon ID {bonId} șters din așteptare");
 
                     // Închide fereastra dacă nu mai sunt bonuri
                     if (_bonuri.Count == 0)
                     {
-                        MessageBox.Show("Nu mai există bonuri în așteptare.",
-                            "Informație", MessageBoxButton.OK, MessageBoxImage.Information);
                         DialogResult = false;
                         Close();
                     }
@@ -129,8 +159,6 @@ namespace SysManager
             }
             catch (Exception ex)
             {
-                MessageBox.Show($"Eroare la ștergerea bonului: {ex.Message}",
-                    "Eroare", MessageBoxButton.OK, MessageBoxImage.Error);
                 Logs.Write("EROARE ștergere bon:");
                 Logs.Write(ex);
             }
@@ -143,6 +171,41 @@ namespace SysManager
         {
             DialogResult = false;
             Close();
+        }
+
+        // ═══════════════════════════════════════════════════════════════
+        // EVENT HANDLERS PENTRU BUTOANE SCROLL
+        // ═══════════════════════════════════════════════════════════════
+
+        /// <summary>
+        /// Buton Scroll SUS - Derulează lista în sus
+        /// </summary>
+        private void BtnScrollUp_Click(object sender, RoutedEventArgs e)
+        {
+            if (BonuriScrollViewer != null)
+            {
+                // Derulează cu un card în sus (aproximativ 100px)
+                double scrollAmount = 100;
+                double newOffset = Math.Max(0, BonuriScrollViewer.VerticalOffset - scrollAmount);
+                BonuriScrollViewer.ScrollToVerticalOffset(newOffset);
+            }
+        }
+
+        /// <summary>
+        /// Buton Scroll JOS - Derulează lista în jos
+        /// </summary>
+        private void BtnScrollDown_Click(object sender, RoutedEventArgs e)
+        {
+            if (BonuriScrollViewer != null)
+            {
+                // Derulează cu un card în jos (aproximativ 100px)
+                double scrollAmount = 100;
+                double newOffset = Math.Min(
+                    BonuriScrollViewer.ScrollableHeight,
+                    BonuriScrollViewer.VerticalOffset + scrollAmount
+                );
+                BonuriScrollViewer.ScrollToVerticalOffset(newOffset);
+            }
         }
     }
 }

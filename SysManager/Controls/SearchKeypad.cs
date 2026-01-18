@@ -61,7 +61,7 @@ namespace SysManager.Controls
         /// <summary>
         /// Event declanșat când se anulează
         /// </summary>
-        public event EventHandler Cancelled;
+        //public event EventHandler Cancelled;
 
         #endregion
 
@@ -164,12 +164,6 @@ namespace SysManager.Controls
             {
                 btnEnter.Click += (s, e) => Search();
             }
-
-            // ✅ BUTON CANCEL
-            if (GetTemplateChild("BtnCancel") is Button btnCancel)
-            {
-                btnCancel.Click += (s, e) => Cancel();
-            }
         }
 
         #endregion
@@ -269,12 +263,6 @@ namespace SysManager.Controls
         {
             Logs.Write($"SearchKeypad: Search → Text: {CurrentText}");
             SearchRequested?.Invoke(this, CurrentText);
-        }
-
-        private void Cancel()
-        {
-            Logs.Write("SearchKeypad: Cancel");
-            Cancelled?.Invoke(this, EventArgs.Empty);
         }
 
         #endregion

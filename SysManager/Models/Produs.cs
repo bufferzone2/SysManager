@@ -23,5 +23,9 @@ namespace SysManager.Models
         public string PretFormatat => $"{PretBrut:F2} RON";
         public string StocFormatat => "N/A"; // Dacă ai stoc, calculează aici
         public bool AreImagine => ShowImage == 1 && !string.IsNullOrWhiteSpace(CaleImagine);
+        /// <summary>
+        /// Verifică dacă produsul are garanție SGR
+        /// </summary>
+        public bool AreGarantieSGR => !string.IsNullOrWhiteSpace(CodSGR);
     }
 }

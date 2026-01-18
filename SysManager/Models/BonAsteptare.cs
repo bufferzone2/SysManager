@@ -41,5 +41,6 @@ namespace SysManager.Models
         public decimal Cantitate { get; set; }
         public decimal PretUnitar { get; set; }
         public decimal Valoare { get; set; }
+        public bool EsteGarantie { get; set; }
     }
 }

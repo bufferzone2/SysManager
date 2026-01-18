@@ -5,8 +5,11 @@ using System.ComponentModel;
 using System.Linq;
 using SysManager.Models;
 
+
 namespace SysManager.Managers
 {
+
+
     /// <summary>
     /// Manager pentru gestionarea bonului fiscal curent
     /// Gestionează adăugarea, ștergerea și modificarea produselor
@@ -16,7 +19,8 @@ namespace SysManager.Managers
         // ═══════════════════════════════════════════════════════════════
         // PROPRIETĂȚI
         // ═══════════════════════════════════════════════════════════════
-
+        private readonly DbQuery _dbQuery;
+        private readonly SmConfig _config;
         /// <summary>
         /// Colecția observabilă de produse din bonul curent
         /// </summary>
@@ -88,11 +92,13 @@ namespace SysManager.Managers
         // CONSTRUCTOR
         // ═══════════════════════════════════════════════════════════════
 
-        public BonManager()
+        public BonManager(DbQuery dbQuery, SmConfig config)
         {
+            _dbQuery = dbQuery ?? throw new ArgumentNullException(nameof(dbQuery));
+            _config = config ?? throw new ArgumentNullException(nameof(config));
+
             Items = new ObservableCollection<BonItem>();
 
-            // ✅ Ascultă modificările în colecție
             Items.CollectionChanged += (s, e) =>
             {
                 RecalculeazaTotal();
@@ -100,6 +106,8 @@ namespace SysManager.Managers
                 OnPropertyChanged(nameof(NumarBucati));
                 OnPropertyChanged(nameof(EsteGol));
             };
+
+            Logs.Write($"✅ BonManager inițializat - SGR={(_config.IsSGREnabled ? "ACTIVAT" : "DEZACTIVAT")}");
         }
 
         // ═══════════════════════════════════════════════════════════════
@@ -108,11 +116,15 @@ namespace SysManager.Managers
 
         /// <summary>
         /// Adaugă sau incrementează produsul în bonul curent
-        /// ✅ MODIFICAT: Folosește PretBrut (cu TVA) pentru calcul, NU Pret (fără TVA)!
+        /// ✅ MODIFICAT: Adaugă automat garanția SGR dacă produsul are CodSGR setat
         /// </summary>
         /// <param name="produs">Produsul de adăugat</param>
         /// <param name="cantitate">Cantitatea (default: 1)</param>
         /// <returns>BonItem adăugat sau actualizat</returns>
+        /// <summary>
+        /// Adaugă sau incrementează produsul în bonul curent
+        /// ✅ Adaugă garanția SGR DOAR dacă ENABLED_SGR = 1
+        /// </summary>
         public BonItem AdaugaProdus(Produs produs, decimal cantitate = 1)
         {
             if (produs == null)
@@ -121,49 +133,202 @@ namespace SysManager.Managers
             if (cantitate <= 0)
                 throw new ArgumentException("Cantitatea trebuie să fie pozitivă", nameof(cantitate));
 
-            // ✅ Verifică dacă produsul există deja
-            var itemExistent = Items.FirstOrDefault(x => x.IdProdus == produs.Id);
+            var itemExistent = Items.FirstOrDefault(x => x.IdProdus == produs.Id &&
+                                                         x.GarantiePentruProdusId == null);
 
             if (itemExistent != null)
             {
-                // ✅ Produsul există → INCREMENTEAZĂ cantitatea
                 var cantitateBefore = itemExistent.Cantitate;
                 itemExistent.Cantitate += cantitate;
 
                 Logs.Write($"  → Cantitate actualizată pentru '{itemExistent.Nume}': {cantitateBefore} → {itemExistent.Cantitate}");
+
+                // ═══════════════════════════════════════════════════════════════
+                // ✅ VERIFICĂ DACĂ SGR ESTE ACTIVAT ÎN CONFIGURAȚIE
+                // ═══════════════════════════════════════════════════════════════
+                if (_config.IsSGREnabled && !string.IsNullOrWhiteSpace(produs.CodSGR))
+                {
+                    SincronizeazaCantitateGarantieCuProdus(itemExistent);
+                }
 
                 CantitateModificata?.Invoke(this, itemExistent);
                 return itemExistent;
             }
             else
             {
-                // ✅ Produs NOU → ADAUGĂ în bon
-                // ⚠️ MODIFICARE CRITICĂ: Folosim PretBrut (cu TVA), NU Pret (fără TVA)!
                 var bonItem = new BonItem
                 {
                     IdProdus = produs.Id,
                     Nume = produs.Denumire,
                     Cantitate = cantitate,
-                    ValoareTva = produs.ValoareTva,         // Valoare tva produs
-                    PretBrut = produs.PretBrut,             // Pret brut
-                    ProcentTva = produs.ProcentTva,         // Procent tva
+                    ValoareTva = produs.ValoareTva,
+                    PretBrut = produs.PretBrut,
+                    ProcentTva = produs.ProcentTva,
                     TvaId = produs.TvaId,
                     CodSGR = produs.CodSGR,
                     UnitateMasura = produs.UnitateMasura,
-                    Departament = produs.Departament
+                    Departament = produs.Departament,
+                    GarantiePentruProdusId = null
                 };
 
-                // ✅ Ascultă modificările cantității pentru recalculare
                 bonItem.PropertyChanged += BonItem_PropertyChanged;
-
                 Items.Add(bonItem);
 
                 Logs.Write($"✅ Produs NOU adăugat: {bonItem.Nume} - {bonItem.Cantitate} × {bonItem.PretBrut:F2} LEI = {bonItem.Total:F2} LEI");
+
+                // ═══════════════════════════════════════════════════════════════
+                // ✅ ADAUGĂ GARANȚIE DOAR DACĂ SGR ESTE ACTIVAT
+                // ═══════════════════════════════════════════════════════════════
+                if (_config.IsSGREnabled && !string.IsNullOrWhiteSpace(produs.CodSGR))
+                {
+                    AdaugaGarantieDupaProdus(bonItem);
+                }
+                else if (!string.IsNullOrWhiteSpace(produs.CodSGR))
+                {
+                    Logs.Write($"  ℹ️ SGR dezactivat în configurație - nu se adaugă garanție pentru '{bonItem.Nume}'");
+                }
 
                 ProdusAdaugat?.Invoke(this, bonItem);
                 return bonItem;
             }
         }
+
+        /// <summary>
+        /// Adaugă garanția SGR IMEDIAT DUPĂ produsul specificat
+        /// </summary>
+        /// <param name="produs">Produsul pentru care se adaugă garanția</param>
+        private void AdaugaGarantieDupaProdus(BonItem produs)
+        {
+            if (produs == null || string.IsNullOrWhiteSpace(produs.CodSGR))
+                return;
+
+            try
+            {
+                // ✅ Convertește CodSGR în ID
+                if (!int.TryParse(produs.CodSGR, out int idProdusGarantie))
+                {
+                    Logs.Write($"⚠️ CodSGR invalid: '{produs.CodSGR}'");
+                    return;
+                }
+
+                // ✅ Încarcă produsul garanție din DB
+                var produsGarantie = _dbQuery.GetProdusDupaId(idProdusGarantie);
+
+                if (produsGarantie == null)
+                {
+                    Logs.Write($"⚠️ Produsul garanție cu ID={idProdusGarantie} nu a fost găsit!");
+                    return;
+                }
+
+                // ✅ Găsește poziția produsului în listă
+                int indexProdus = Items.IndexOf(produs);
+
+                if (indexProdus == -1)
+                {
+                    Logs.Write($"⚠️ Produsul '{produs.Nume}' nu a fost găsit în Items!");
+                    return;
+                }
+
+                // ═══════════════════════════════════════════════════════════════
+                // ✅ CREEAZĂ GARANȚIA CU ACEEAȘI CANTITATE CA PRODUSUL
+                // ═══════════════════════════════════════════════════════════════
+                var bonItemGarantie = new BonItem
+                {
+                    IdProdus = produsGarantie.Id,
+                    Nume = produsGarantie.Denumire,  // Ex: "GARANȚIE SGR"
+                    Cantitate = produs.Cantitate,    // ✅ Aceeași cantitate ca produsul
+                    ValoareTva = produsGarantie.ValoareTva,
+                    PretBrut = produsGarantie.PretBrut,
+                    ProcentTva = produsGarantie.ProcentTva,
+                    TvaId = produsGarantie.TvaId,
+                    CodSGR = produsGarantie.CodSGR,
+                    UnitateMasura = produsGarantie.UnitateMasura,
+                    Departament = produsGarantie.Departament,
+                    GarantiePentruProdusId = produs.IdProdus  // ✅ Link către produsul său
+                };
+
+                bonItemGarantie.PropertyChanged += BonItem_PropertyChanged;
+
+                // ✅ INSEREAZĂ GARANȚIA IMEDIAT DUPĂ PRODUS (index + 1)
+                Items.Insert(indexProdus + 1, bonItemGarantie);
+
+                Logs.Write($"  ✅ Garanție SGR adăugată după '{produs.Nume}': {produsGarantie.Denumire} × {bonItemGarantie.Cantitate} = {bonItemGarantie.Total:F2} LEI");
+            }
+            catch (Exception ex)
+            {
+                Logs.Write($"❌ EROARE la adăugarea garanției pentru '{produs.Nume}':");
+                Logs.Write(ex);
+            }
+        }
+
+
+        /// <summary>
+        /// Incrementează cantitatea unui articol
+        /// ✅ Incrementează automat și garanția
+        /// </summary>
+        public bool IncrementeazaCantitate(BonItem item, decimal increment = 1)
+        {
+            if (item == null || !Items.Contains(item))
+                return false;
+
+            if (item.GarantiePentruProdusId != null)
+            {
+                Logs.Write("⚠️ Nu poți modifica manual garanția!");
+                return false;
+            }
+
+            decimal cantitateBefore = item.Cantitate;
+            item.Cantitate += increment;
+
+            Logs.Write($"📝 Cantitate modificată pentru '{item.Nume}': {cantitateBefore} → {item.Cantitate}");
+
+            // ✅ Sincronizează garanția DOAR dacă SGR este activat
+            if (_config.IsSGREnabled && !string.IsNullOrWhiteSpace(item.CodSGR))
+            {
+                SincronizeazaCantitateGarantieCuProdus(item);
+            }
+
+            CantitateModificata?.Invoke(this, item);
+            return true;
+        }
+
+        /// <summary>
+        /// Decrementează cantitatea unui articol
+        /// ✅ Decrementează automat și garanția
+        /// </summary>
+        public bool DecrementeazaCantitate(BonItem item, decimal decrement = 1)
+        {
+            if (item == null || !Items.Contains(item))
+                return false;
+
+            if (item.GarantiePentruProdusId != null)
+            {
+                Logs.Write("⚠️ Nu poți modifica manual garanția!");
+                return false;
+            }
+
+            decimal cantitateNoua = item.Cantitate - decrement;
+
+            if (cantitateNoua <= 0)
+            {
+                return StergeArticol(item);
+            }
+
+            decimal cantitateBefore = item.Cantitate;
+            item.Cantitate = cantitateNoua;
+
+            Logs.Write($"📝 Cantitate modificată pentru '{item.Nume}': {cantitateBefore} → {item.Cantitate}");
+
+            // ✅ Sincronizează garanția DOAR dacă SGR este activat
+            if (_config.IsSGREnabled && !string.IsNullOrWhiteSpace(item.CodSGR))
+            {
+                SincronizeazaCantitateGarantieCuProdus(item);
+            }
+
+            CantitateModificata?.Invoke(this, item);
+            return true;
+        }
+
 
         // ═══════════════════════════════════════════════════════════════
         // METODE PUBLICE - ȘTERGERE
@@ -259,33 +424,7 @@ namespace SysManager.Managers
             return true;
         }
 
-        /// <summary>
-        /// Incrementează cantitatea unui articol
-        /// </summary>
-        /// <param name="item">Articolul</param>
-        /// <param name="increment">Valoarea de incrementare (default: 1)</param>
-        /// <returns>True dacă operația a reușit</returns>
-        public bool IncrementeazaCantitate(BonItem item, decimal increment = 1)
-        {
-            if (item == null || !Items.Contains(item))
-                return false;
 
-            return ModificaCantitate(item, item.Cantitate + increment);
-        }
-
-        /// <summary>
-        /// Decrementează cantitatea unui articol
-        /// </summary>
-        /// <param name="item">Articolul</param>
-        /// <param name="decrement">Valoarea de decrementare (default: 1)</param>
-        /// <returns>True dacă operația a reușit</returns>
-        public bool DecrementeazaCantitate(BonItem item, decimal decrement = 1)
-        {
-            if (item == null || !Items.Contains(item))
-                return false;
-
-            return ModificaCantitate(item, item.Cantitate - decrement);
-        }
 
         // ═══════════════════════════════════════════════════════════════
         // METODE PUBLICE - CĂUTARE
@@ -359,6 +498,7 @@ namespace SysManager.Managers
 
         /// <summary>
         /// Handler pentru modificarea proprietăților din BonItem
+        /// ✅ Sincronizează automat cantitatea garanției cu produsul
         /// </summary>
         private void BonItem_PropertyChanged(object sender, PropertyChangedEventArgs e)
         {
@@ -368,12 +508,94 @@ namespace SysManager.Managers
             {
                 RecalculeazaTotal();
 
+                // ✅ ELIMINĂ SINCRONIZAREA AUTOMATĂ
+                // Garanția se sincronizează explicit în IncrementeazaCantitate/DecrementeazaCantitate
+
                 if (sender is BonItem item && e.PropertyName == nameof(BonItem.Cantitate))
                 {
                     CantitateModificata?.Invoke(this, item);
                 }
             }
         }
+
+        /// <summary>
+        /// Sincronizează cantitatea garanției cu cantitatea produsului
+        /// </summary>
+        private void SincronizeazaCantitateGarantieCuProdus(BonItem produs)
+        {
+            if (produs == null || string.IsNullOrWhiteSpace(produs.CodSGR))
+                return;
+
+            // ✅ NU sincroniza dacă acest item ESTE o garanție
+            if (produs.GarantiePentruProdusId != null)
+                return;
+
+            try
+            {
+                if (!int.TryParse(produs.CodSGR, out int idProdusGarantie))
+                {
+                    Logs.Write($"⚠️ CodSGR invalid pentru sincronizare: '{produs.CodSGR}'");
+                    return;
+                }
+
+                // ═══════════════════════════════════════════════════════════════
+                // ✅ GĂSEȘTE GARANȚIA ACESTUI PRODUS SPECIFIC
+                // Garanția trebuie să îndeplinească TOATE condițiile:
+                // 1. Are IdProdus = idProdusGarantie (este o garanție)
+                // 2. Are GarantiePentruProdusId = produs.IdProdus (e garanția ACESTUI produs)
+                // 3. Vine imediat după produs în listă
+                // ═══════════════════════════════════════════════════════════════
+
+                int indexProdus = Items.IndexOf(produs);
+
+                if (indexProdus == -1)
+                {
+                    Logs.Write($"⚠️ Produsul '{produs.Nume}' nu a fost găsit în Items pentru sincronizare!");
+                    return;
+                }
+
+                // ✅ Verifică dacă există item după produs
+                if (indexProdus + 1 >= Items.Count)
+                {
+                    Logs.Write($"⚠️ Nu există garanție după '{produs.Nume}' (index={indexProdus}, Count={Items.Count})");
+                    return;
+                }
+
+                var garantieCandidata = Items[indexProdus + 1];
+
+                // ✅ VERIFICĂRI STRICTE pentru a fi siguri că este garanția ACESTUI produs
+                bool esteGarantiaCeaCorecta =
+                    garantieCandidata.IdProdus == idProdusGarantie &&                    // Este o garanție
+                    garantieCandidata.GarantiePentruProdusId == produs.IdProdus;        // Este garanția ACESTUI produs
+
+                if (!esteGarantiaCeaCorecta)
+                {
+                    Logs.Write($"⚠️ Item-ul după '{produs.Nume}' nu este garanția sa!");
+                    Logs.Write($"   Expected: IdProdus={idProdusGarantie}, GarantiePentruProdusId={produs.IdProdus}");
+                    Logs.Write($"   Got: IdProdus={garantieCandidata.IdProdus}, GarantiePentruProdusId={garantieCandidata.GarantiePentruProdusId}");
+                    return;
+                }
+
+                // ✅ Sincronizează cantitatea
+                if (garantieCandidata.Cantitate != produs.Cantitate)
+                {
+                    decimal garantieBefore = garantieCandidata.Cantitate;
+                    garantieCandidata.Cantitate = produs.Cantitate;
+
+                    Logs.Write($"  ✅ Garanție sincronizată pentru '{produs.Nume}': {garantieBefore} → {garantieCandidata.Cantitate}");
+                }
+                else
+                {
+                    Logs.Write($"  ℹ️ Garanție deja sincronizată pentru '{produs.Nume}': {garantieCandidata.Cantitate}");
+                }
+            }
+            catch (Exception ex)
+            {
+                Logs.Write($"❌ EROARE la sincronizarea garanției pentru '{produs.Nume}':");
+                Logs.Write(ex);
+            }
+        }
+
 
         // ═══════════════════════════════════════════════════════════════
         // INotifyPropertyChanged IMPLEMENTATION
